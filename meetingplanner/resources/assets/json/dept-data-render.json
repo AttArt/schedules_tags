@@ -1,0 +1,164 @@
+ 
+{
+    "Dept": [
+        {
+            "id" : "engineer",
+            "name" : "วิศวะกรรม/ช่างซ่อมบำรุง",
+            "color" : "#9E5FFF",
+            "rgb" : ["#e6e6e6","#d8bfff","#c49fff","#b17eff","#9E5FFF"] ,
+            "class" : "dept-engineer",
+            "active" : true
+        }, {
+            "id" : "boiler",
+            "name" : "Boiler",
+            "color" : "#00A9FF",
+            "rgb" : ["#e6e6e6","#b2e5ff","#66cbff","#32baff","#00A9FF"] ,
+            "class" : "dept-boiler",
+            "active" : true
+        }, {
+            "id" : "wastewater",
+            "name" : "บำบัดน้ำเสีย",
+            "color" : "#FF5583",
+            "rgb" : ["#e6e6e6","#ffccd9","#ff99b4","#ff769b","#FF5583"] ,
+            "class" : "dept-wastewater",
+            "active" : true
+        }, {
+            "id" : "calibration",
+            "name" : "สอบเทียบ",
+            "color" : "#03BD9E",
+            "rgb" : ["#e6e6e6","#b3ebe1","#67d7c4","#35cab1","#03BD9E"] ,
+            "class" : "dept-calibration",
+            "active" : true
+        }, {
+            "id" : "manufacture",
+            "name" : "ผลิต",
+            "color" : "#90e900",
+            "rgb" : ["#e6e6e6","#e2ffb3","#cfff81","#b1ef4c","#90e900"] ,
+            "class" : "dept-manufacture",
+            "active" : true
+        }, {
+            "id" : "c-lab",
+            "name" : "C-Lab",
+            "color" : "#6d6d6d",
+            "rgb" : ["#e6e6e6","#d3d3d3","#a7a7a7","#8a8a8a","#6d6d6d"] ,
+            "class" : "dept-c-lab",
+            "active" : true
+        }, {
+            "id" : "compound",
+            "name" : "Compound",
+            "color" : "#FFBB3B",
+            "rgb" : ["#e6e6e6","#ffeac4","#ffd689","#ffc862","#FFBB3B"] ,
+            "class" : "dept-compound",
+            "active" : true
+        }, {
+            "id" : "contain",
+            "name" : "บรรจุ",
+            "color" : "#FF4040",
+            "rgb" : ["#e6e6e6","#ffc5c5","#ff8c8c","#ff6666","#FF4040"] ,
+            "class" : "dept-contain",
+            "active" : true
+        }, {
+            "id" : "purchase",
+            "name" : "จัดซื้อ",
+            "color" : "#DE7FE6",
+            "rgb" : ["#e6e6e6","#f5d8f7","#ebb2f0","#e498eb","#DE7FE6"] ,
+            "class" : "dept-purchase",
+            "active" : true
+        }, {
+            "id" : "safety",
+            "name" : "Safety",
+            "color" : "#8A6D3B",
+            "rgb" : ["#e6e6e6","#dbd3c4","#b8a789","#a18a62","#8A6D3B"] ,
+            "class" : "dept-safety",
+            "active" : true
+        }, {
+            "id" : "hr",
+            "name" : "HR",
+            "color" : "#FFEC42",
+            "rgb" : ["#e6e6e6","#fff9c6","#fff598","#fff16f","#ffeb32"] ,
+            "class" : "dept-hr",
+            "active" : true
+        }
+    ],
+
+    "meetingRoom": [
+        {
+            "id" : "meetingroom-1",
+            "name" : "Meeting Room 1",
+            "active" : true
+        },
+        {
+            "id" : "meetingroom-2",
+            "name" : "Meeting Room 2",
+            "active" : true
+        },
+        {
+            "id" : "meetingroom-3",
+            "name" : "Meeting Room 3",
+            "active" : true
+        },
+        {
+            "id" : "meetingroom-4",
+            "name" : "Meeting Room 4",
+            "active" : true
+        },
+        {
+            "id" : "meetingroom-5",
+            "name" : "Meeting Room 5",
+            "active" : true
+        },
+        {
+            "id" : "meetingroom-6",
+            "name" : "Meeting Room 6",
+            "active" : true
+        }
+    ],
+
+    "accessories": [
+        {
+            "id" : "item-1",
+            "name" : "accessories 1",
+            "active" : true
+        },
+        {
+            "id" : "item-2",
+            "name" : "accessories 2",
+            "active" : true
+        },
+        {
+            "id" : "item-3",
+            "name" : "accessories 3",
+            "active" : true
+        },
+        {
+            "id" : "item-4",
+            "name" : "accessories 4",
+            "active" : true
+        }
+    ],
+
+    "event": [
+        {
+            "appointid" : "apoint-152023-0001",
+            "title" : "ABC",
+            "planner" : "suwanee",
+            "mdetail" : ""
+        }
+    ],
+
+    "showtime": [
+        {
+            "planid" : "plan-01-152023-0001",
+            "appointid" : "apoint-152023-0001",
+            "mrid" : "meetingroom-1",
+            "deptid" : "safety",
+            "planner" : "suwanee",
+            "adate" : "accessories 1",
+            "startdate" : "2023-06-15 11:00:00",
+            "enddate" : "2023-06-15 17:00:00"
+           
+         }
+    ]
+    
+}
+

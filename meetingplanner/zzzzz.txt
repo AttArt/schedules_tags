@@ -1,0 +1,522 @@
+class Chart {
+
+    constructor() {
+        this.schedule = [];
+        this.dept = '';
+        this.year = '';
+        this.mrid = '';
+
+        this.max_growing = 366;
+        this.yf = 136.5;
+        this.ydif = 4.2;
+        this.xf = 30;
+        this.xdif = 70.5;
+
+        this.prevElementClass = "";
+    }
+
+    setDataSchedule = (newData) => {
+        this.schedule = newData;
+    }
+
+    setYear = (year) => {
+        this.year = year;
+    }
+
+    getYear = () => {
+        return  this.year
+    }
+
+    setDept = (dept) => {
+        this.dept = dept;
+    }
+
+    setMrid = (mrid) => {
+        this.mrid = mrid;
+    }
+    
+    getMrid = () => {
+        return  this.mrid
+    }
+
+    lineOn(elementBoxcolor,eLine,color) {
+        elementBoxcolor.style.setProperty( "--sum-chart", '"ปิด"' )
+        eLine.style.display = 'block'
+        elementBoxcolor.style.backgroundColor = color;
+        elementBoxcolor.style.outlineColor = '#fff';
+        document.querySelectorAll('.point-of-chart-lint-tooltip.tooltip-' +  String(color).slice(1)).forEach((tooltip) => {
+                tooltip.style.display = 'block'
+        })
+    }
+
+    lineOff(elementBoxcolor,eLine,color) {
+        elementBoxcolor.style.setProperty( "--sum-chart", '"เปิด"' )
+        eLine.style.animation = 'fadeOut .7s';
+        setTimeout(() => {
+            eLine.style.display = 'none';
+        }, 505);
+        elementBoxcolor.style.backgroundColor = '#e6e6e6';
+        elementBoxcolor.style.outlineColor = '#fff';
+        document.querySelectorAll('.point-of-chart-lint-tooltip.tooltip-' +  String(color).slice(1)).forEach((tooltip) => {
+                tooltip.style.display = 'none'
+        })
+    }
+
+    renderViewValueObj(obj, color, name, sumall) {
+        let sum = 0;
+        obj.forEach(( e, index ) => {
+            if(typeof e == 'string') {
+                sum += parseInt(e)
+
+            } else {
+                sum += e;
+            }
+        })
+
+        let elementCircle = '<div class="chart-donut value-of-obj" style="--title-chart:\'' + name + '\'; ">\
+                                <svg viewBox="-2 -2 40 40" class="circular-chart" style="--donut-color:' + color + '">\
+                                    <path class="circle-bg"\
+                                        d="M18 2.0845\
+                                        a 15.9155 15.9155 0 0 1 0 31.831\
+                                        a 15.9155 15.9155 0 0 1 0 -31.831"\
+                                    />\
+                                    <path class="circle"\
+                                        stroke-dasharray="' + ( sum != 0 ? parseFloat((parseInt(sum)/sumall)*100).toFixed(2) : 0 )  + ', 100"\
+                                        d="M18 2.0845\
+                                        a 15.9155 15.9155 0 0 1 0 31.831\
+                                        a 15.9155 15.9155 0 0 1 0 -31.831"\
+                                    />\
+                                    <text x="19" y="21.35" class="percentage">' + (  sum != 0 ? parseFloat((parseInt(sum)/sumall)*100).toFixed(1) : 0 ) + ' %</text>\
+                                </svg>\
+                            </div>'
+        
+        let elementBar =    '<div class="chart-bar small-font-size">\
+                                <div class="bar bar-0 barX">\
+                                    <div class="face side-0">\
+                                        <div class="growing-bar" style="--color-bar:' + color + '; --value-growing:\'' + sum + '\'; transform: translateY(' + ( sum != 0 ? ( 100 - ( sum/this.max_growing) * 100 ): 100) + '%); opacity: .6;"></div>\
+                                    </div>\
+                                    <div class="face side-1">\
+                                        <div class="growing-bar"  style="--color-bar:' + color + '; --value-growing:\'' + '' + '\'; transform: translateY(' + ( sum != 0 ? ( 100 - ( sum/this.max_growing) * 100 ): 100) + '%); opacity: .6;"></div>\
+                                    </div>\
+                                    <div class="face top"></div>\
+                                    <div class="face floor" style="--donut-floor-color:' + color + '"></div>\
+                                </div>\
+                            </div>'
+
+        let elementBoxcolor = document.createElement("div");
+        elementBoxcolor.classList += 'box-color-of-obj-chart-line ' + 'box-' + String(color).slice(1)
+        elementBoxcolor.style =  "--sum-chart:'" + 'ปิด' + "';--color-box-of-chart-line:" + color + ""
+        elementBoxcolor.addEventListener('click', (e) => { 
+
+            
+            let eBtn =  document.querySelector('.box-color-of-obj-chart-line.' + 'box-' + String(color).slice(1))
+            let eLine = document.querySelector('.box-color-' +  String(color).slice(1))
+
+            if(elementBoxcolor.classList.contains('disable')) {
+                this.lineOn(elementBoxcolor,eLine,color)
+            
+
+            } else {
+                this.lineOff(elementBoxcolor,eLine,color)
+
+            }
+
+            elementBoxcolor.classList.toggle('disable')
+
+        });
+
+        document.querySelector('.content-foot-chart').innerHTML += elementCircle;
+        document.querySelector('.content-chart-bar').innerHTML += elementBar;
+        
+        document.querySelector('.side-data-right').appendChild(elementBoxcolor);
+
+        elementCircle = ''
+        elementBar = ''
+
+        return sum;
+    }
+
+     renderChartLineElement(dataY, color) {
+
+        let polyline = '<polyline class="chart-line-x box-color-' + String(color).slice(1) + '\" points=" ';
+        let circle = ""; 
+        
+        dataY.forEach((e, index) => {
+            let txtX = index == 0 ?  this.xf : this.xf + (this.xdif * (index));
+            let calY = Math.abs( this.yf - (parseInt(e) * this.ydif ) );
+            let colorObj = String(color).slice(1);
+
+            polyline +=  txtX  + ',' +  calY + ' '    
+            if(dataY.length-1 == index) {
+                polyline+= '"style=" stroke:' + color + ';stroke-width:2 "></polyline>'
+            }
+            
+            circle += '<circle class="point-of-chart-line point-x-'+  colorObj +' " cx="' + txtX + '" cy="' + calY + '" r="3" stroke="#fff" stroke-width="2" fill="' + color + '"/>'
+            circle += '<circle style="opacity: 0" class="point-of-chart-lint-tooltip tooltip-' +  colorObj +'" cx="' + ( txtX ) + '" cy="' + ( calY < 15 ?   calY + 16 :  calY - 16 ) + '" r="10" stroke="#e6e6e6" stroke-width="3" fill="' + '#ffff' + '"/>'
+            circle += '<text style="opacity: 0" class="point-of-chart-lint-tooltip tooltip-' +  colorObj +'" x="' + ( e.length > 1? txtX - 3.9 : txtX - 2.5 ) + '" y="' + ( calY < 15 ?   calY + 18 :  calY - 13 )  + '" font-size=".5rem" fill="#5F5757">' + e + '</text>'
+
+            calY = null;
+            txtX = null;
+            colorObj = null;
+
+        });
+
+   
+
+
+        return polyline + circle;
+
+    }
+
+    renderViewX(dataXaxis) {
+
+        let element = "";
+
+        dataXaxis.forEach(( month, index ) => {
+            let txtX = index == 0 ?  this.xf : this.xf + (this.xdif * (index)) 
+
+            element += '<text x="' + ( txtX - 6 ) + '" y="148" font-size=".5rem" fill="#5F5757">' + month + '</text>\
+                        <polygon points="' + txtX + ',' + 0 + ' ' + txtX + ',' + 135 + '" style="fill:none; stroke:#e6e6e6;"/>';
+
+        });
+        
+        return element;
+
+    }
+
+    renderViewY(dataYaxis) {
+
+        let element = "";
+
+        dataYaxis.reverse().forEach(( valueX, index ) => {
+            let txtY = Math.abs( this.yf - (parseInt(valueX) * this.ydif) ) + 2
+
+            element += '<text x="' + 20 + '" y="' + (txtY) + '" font-size=".5rem" fill="#5F5757">' + valueX + '</text>';
+
+        });
+
+        return element;
+
+    }
+
+    
+    chartLineDisplayON(codeId) {
+
+        document.querySelectorAll('.chart-line-x').forEach((line) => {
+            if(!line.classList.contains('focus')) {
+                line.style.animation = 'fadeOutFocus .2s';
+                line.style.opacity = '0.1'
+            }
+        })
+
+        document.querySelectorAll('.point-of-chart-line').forEach((point) => {
+            point.style.animation = 'fadeOutFocus .7s';
+            point.style.opacity = '0.1'
+        
+        })
+
+        document.querySelectorAll('.point-x-' + codeId).forEach((point) => {
+            point.style.opacity = '0.8'
+        })
+
+
+        document.querySelectorAll('.point-of-chart-lint-tooltip.tooltip-' + codeId).forEach((tooltip) => {
+                tooltip.style.opacity = '0.8'
+        })
+
+        if(this.prevElementClass != "" && this.prevElementClass != '.point-of-chart-lint-tooltip.tooltip-' + codeId) {
+            document.querySelectorAll(this.prevElementClass).forEach((tooltip) => {
+                tooltip.style.opacity = '0'
+            })
+        }
+        
+        this.prevElementClass = '.point-of-chart-lint-tooltip.tooltip-' + codeId;
+
+    }
+
+    chartLineDisplayOFF(codeId) {
+
+        document.querySelectorAll('.chart-line-x').forEach((line) => {
+            line.style.animation = 'fadeInFocus .7s';
+            line.style.opacity = '0.8'
+            line.classList.remove('focus')
+        })
+
+        document.querySelectorAll('.point-of-chart-line').forEach((point) => {
+            point.style.animation = 'fadeInFocus .7s';
+            point.style.opacity = '10.8'
+        })
+
+        document.querySelectorAll('.point-of-chart-lint-tooltip').forEach((tooltip) => {
+                tooltip.style.opacity = '0'
+        })
+
+    }
+
+    AddlistenerChartAtline(colorObj) {
+
+        let elementClass = '';
+
+        colorObj.forEach(( code, index ) => {
+
+            elementClass = '.box-color-' +  String(code).slice(1)
+        
+            try {
+                document.querySelector(elementClass).addEventListener('click', (e) => { 
+                    if(e.target.classList.contains('focus')) {
+                        this.chartLineDisplayOFF(String(code).slice(1))
+
+                    } else {
+
+                        document.querySelectorAll('.chart-line-x.focus').forEach((line) => {
+                            line.classList.remove('focus')
+                        })
+
+                        e.target.style.opacity = '0.8'
+                        e.target.classList.add('focus')
+
+                        this.chartLineDisplayON(String(code).slice(1))
+                    
+                    }
+
+                });
+
+            } catch {
+                
+            }
+
+        })
+        
+        elementClass = '';
+    }
+
+   mapDataPointYForChart = (room, objY, year, dataVY) => {
+        let valOfChart =  [];
+        let thisYear = dataVY.filter(
+                                        (event) => ( 
+                                            event.deptid == objY 
+                                            && event.mrid == room
+                                            && new Date(event.startdate).getFullYear() == year
+                                        ) 
+                                    ) 
+     
+
+        for(let i = new Date().getMonth(); i >= 0; i--) {
+    
+            valOfChart.unshift(
+                thisYear.filter((event) => ( 
+                            new Date(event.startdate).getMonth() == i
+                            && new Date(event.startdate ) < new Date() 
+                        ) 
+                ).length
+            )
+    
+        }
+        console.log(thisYear)
+        console.log(valOfChart)
+        return valOfChart;
+    }
+    
+    mapDataForChart = (room, dataObjY, year, schedule) => {
+    
+      
+        this.setMrid(room)
+
+        let objChart = {
+            data: [],
+            name: [],
+            color: []
+        };
+
+        dataObjY.forEach((e, index) => {  
+           
+            objChart.data.push(this.mapDataPointYForChart(room, e.id, year, schedule))
+            objChart.name.push(e.name)
+            objChart.color.push(e.color)
+        })
+
+        return objChart;
+    }
+
+
+    renderMainChart(rooms) {
+         document.querySelector('.card-chart').innerHTML =  '<div class="chart-head">\
+                                                                <label>Chart line</label>\
+                                                            </div>\
+                                                            <div class="chart-line"></div>\
+                                                            <div class="view-of-chart">\
+                                                                <div class="side-data-right"></div>\
+                                                            </div>\
+                                                            <div class="chart-foot">\
+                                                                <label class="chart-line-foot-title"></label>\
+                                                                <div class="chart-line-nameY"></div>\
+                                                                <div class="content-foot-chart">\
+                                                                    <div class="chart-value-sumAll">\
+                                                                    </div>\
+                                                                    <div class="text-for-chart-value">\
+                                                                        ครั้งใน ปี ' + this.year +'\
+                                                                    </div>\
+                                                                </div>\
+                                                                <div class="content-chart">\
+                                                                    <div class="btn-dropdown-chart-roomds">\
+                                                                        <div class="chartroom" type="button" ><label id="chart-room-input-label">'+  (rooms[rooms.findIndex(obj => { return obj.mrid == this.mrid})].mrname)  +'</label></div>\
+                                                                        <input type="text" name="chart-room-input-name" id="chart-room-input" class="DisplayNone">\
+                                                                        <span class="chart-room-dropdown dropdown">\
+                                                                            <ul>\
+                                                                            </ul>\
+                                                                        </span>\
+                                                                    </div>\
+                                                                    <div class="content-chart-bar">\
+                                                                    </div> \
+                                                                </div>\
+                                                            </div>'
+
+
+        document.querySelector('.chartroom').addEventListener('click', () => {
+            document.querySelector(".chart-room-dropdown").classList.toggle('active')
+        });
+
+        setTimeout(() => {
+            this.renderDropdownChartRooms('chart-room-input', 'chart-room-dropdown', rooms)    
+        }, 50);
+
+    }
+
+    // roomDropdownMenuChart() {
+    //     document.querySelector(".chart-room-dropdown").classList.toggle('active')
+    // }
+
+    renderSVG = (objData) => {
+        let element = "";
+        let sums = 0;
+
+        console.log(objData)
+
+        objData.data.forEach(( data, index ) => {
+            data.forEach(( v, index ) => { sums += parseInt(v)})
+        })
+        
+        objData.data.forEach(( data, index ) => {
+            element += this.renderChartLineElement(data, objData.color[index])
+        
+        })
+
+        objData.name.forEach(( name, index ) => {
+            this.renderViewValueObj( objData.data[index], objData.color[index], name, sums)
+
+        })
+
+
+        document.querySelector('.chart-value-sumAll').innerHTML = sums
+        
+        setTimeout(() => {
+            this.AddlistenerChartAtline(objData.color)
+            //document.querySelector('.card-chart').scrollLeft  = 70 * (( new Date().getMonth()+1)-6)
+
+            if(new Date().getMonth() <= 4) {
+
+                document.querySelector('.card-chart').scrollLeft  = 0
+
+            } else if(new Date().getMonth() <= 8) {
+
+                document.querySelector('.card-chart').scrollLeft  =  document.querySelector('.card-chart').scrollWidth/2 - 200
+            } else if(new Date().getMonth() <= 12) {
+
+                document.querySelector('.card-chart').scrollLeft  = 1000
+            }
+
+        }, 50);
+
+        return element;
+    }
+
+    callFuncRenderChartLine( objData ) {
+
+        this.renderMainChart( objData.room )
+
+        let box_month = document.querySelector('.chart-line');
+
+        document.querySelector('.chart-head label').innerHTML = objData.title
+        document.querySelector('.chart-line-nameY').innerHTML = objData.titleX
+        document.querySelector('.chart-line-foot-title').innerHTML = objData.footTitle
+
+        box_month.innerHTML += '<div class="side-data-left">\
+                                    <svg>'
+                                        +  this.renderViewY(objData.dataYaxis) +
+                                    '</svg>\
+                                </div>\
+                                <div class="chart-line-polygon">\
+                                    <svg>'
+                                        +  this.renderViewX(objData.dataXaxis) + 
+                                    '</svg>\
+                                    <svg class="CompInside-chart">'
+                                        + this.renderSVG(objData) + 
+                                    '</svg>\
+                                    </div>\
+                                    \
+                                    <div class="chart-line-nameX">'
+                                    + objData.titleY + 
+                                    '</div>\
+                                </div>'
+
+        box_month = null
+
+       
+
+    }
+
+    renderDropdownChartRooms(content_class, content_class_add, data) {
+
+        if(data != []) {
+            data.forEach((e, index) => {  
+                if(e.isopen) {
+
+                    let li = document.createElement("li");
+                    li.classList.add(content_class);
+                    li.innerHTML = e.mrname;
+                    li.setAttribute("name",  e.mrname);
+                    li.setAttribute("id",  e.mrid);
+                    li.setAttribute("key",  index);
+                    li.addEventListener('click', () => {
+
+                        // console.log(e.mrname)
+                        document.getElementById(content_class+'-label').innerHTML = e.mrname 
+                        document.getElementById(content_class).value =  e.mrid
+                        // console.log(e.mrid)
+            
+                        document.querySelector('.content-foot-chart').innerHTML =  '<div class="chart-value-sumAll"></div>\
+                                                                                    <div class="text-for-chart-value">\
+                                                                                        ครั้งใน ปี ' + this.year +'\
+                                                                                    </div>'     
+
+                        document.querySelector('.content-chart-bar').innerHTML = '';
+                        document.querySelector('.side-data-right').innerHTML = '';
+                        this.setMrid(e.mrid)
+                        document.querySelector('.CompInside-chart').innerHTML = this.renderSVG( this.mapDataForChart(e.mrid, this.dept, this.year, this.schedule))
+
+                    });
+                    
+
+                    document.querySelector("." + content_class_add +" ul").appendChild(li)
+                    
+                }      
+                
+            });
+
+        
+        }
+    }
+
+    renderChartRoomsThisYaer = (year) => {
+ 
+        this.setYear(year)
+
+        // document.querySelector('.content-chart-bar').innerHTML = '';
+        // document.querySelector('.side-data-right').innerHTML = '';
+        // document.querySelector('.CompInside-chart').innerHTML ='';
+        // document.querySelector('.CompInside-chart').innerHTML = this.renderSVG( this.mapDataForChart(this.mrid, this.dept, year, this.schedule))
+ 
+
+    }
+
+}

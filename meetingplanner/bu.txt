@@ -1,0 +1,4678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href='https://fonts.googleapis.com/css?family=Kanit:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap' rel='stylesheet'>
+    <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/4784/4784480.png" sizes="196x196"> 
+    <title>Meeting Planner</title>
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
+ 
+        :root {
+            --main-bg: #ffffff;
+            --second-bg: #f1f1f1;
+
+            --txt-color: #5F5757;
+            --txt-white: #fff;
+            --main-color: #e6e6e6;
+            --second-color: #F8F8F8;
+            --box-shadow: #4d4d4d46 0px 4px 15px;
+
+            /* color dept */
+            /* --color-engineer:#9E5FFF;
+            --color-boiler:#00A9FF;
+            --color-wastewater:#FF5583;
+            --color-calibration:#03BD9E;
+            --color-manufacture:#9FFF04;
+            --color-c-lab:#9D9D9D;
+            --color-compound:#FFBB3B;
+            --color-contain:#FF4040;
+            --color-purchase:#DE7FE6;
+            --color-safety:#8A6D3B;
+            --color-hr:#FFEC42; */
+ 
+            --primary-clr: #d7d7d7;
+            --transition-cubic: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+            /* --main-bg-light: #ffffff;
+            --second-bg-light: #f5f7fb;
+            --txt-color-light: #13131b;
+            --box-shadow-light: #403e740b 2px 6px 5px;
+
+            --main-bg-dark: #2d2d2d;
+            --second-bg-dark: #202020;
+            --txt-color-dark: #bbbbbb;
+            --box-shadow-dark: #403e740b 2px 6px 5px;
+
+            --main-color-blue: #349eff;
+            --second-color-blue: #62b4ff;
+
+            --main-color-red: #fb0b12;
+            --second-color-red: #ff4a6b;
+
+            --main-color-cyan: #10d4d2;
+            --second-color-cyan: #2ae9e6;
+
+            --main-color-green: #23eb87;
+            --second-color-green: #00e253;
+
+            --main-color-orange: #fca11a;
+            --second-color-orange: #f09917;
+
+            --sidebar-width: 275px;
+            --border-radius: 15px;
+            --topnav-height: 40px;
+            --transition-cubic: cubic-bezier(0.175, 0.885, 0.32, 1.275); */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;           
+            -webkit-tap-highlight-color: transparent;
+            /* font-family: "Roboto","Helvetica","Arial",sans-serif; */
+            font-family: 'Kanit', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            color: var(--txt-color);
+
+        }
+
+        html,body {
+            margin: 0;
+            padding: 0;
+            background-color: #F8F8F8;
+        }
+
+        a {
+            text-decoration: none;
+            color: unset;
+        }
+
+        ul {
+            list-style-type: none;
+        }
+
+        label {
+            pointer-events: none;
+        }
+
+        .container {
+            width: 100%;
+            min-height: 100vh;
+            
+        }
+
+        .topnav {
+            position: fixed;
+            z-index: 99999;
+            width: 100%;
+            padding: 16px 20px;
+            /* overflow: hidden; */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #F8F8F8;
+            filter:drop-shadow(0px 1px 15px rgba(121, 121, 121, 0.1));
+        }
+
+        .topnav i {
+            cursor: pointer;
+            border-radius: 99px;
+            border: 1px solid var(--main-color);
+            margin: 0 5px;
+            padding: 3px;
+        }
+
+        .topnav i:hover {
+            color: var(--primary-clr);
+        }
+
+        .topnav .box-top-l {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .topnav .box-top-l .pj-name-logo{
+            padding: 1px;
+            font-size: 1.3rem;
+            font-weight: 500;
+            letter-spacing: 3px;
+
+        }
+
+        .topnav .box-top-l .meeting-room {
+            margin: 0 15px;
+            display: flex;
+            align-items: center;
+
+            transform-origin: left;
+            transform: scale(0);
+            transition: transform 0.3s ease 0s; 
+        }
+
+        .topnav .box-top-l .meeting-room.active {
+            transform: scale(1);
+            transition: transform 0.5s var(--transition-cubic);
+        }
+
+        .topnav .box-top-l .meeting-room .room {
+            font-size: .8rem;
+            font-weight: 400;
+            padding: 2px 15px;
+            border-radius: 20px;
+            border: 1px solid var(--main-color);
+            margin-left: 0.6rem;
+            cursor: pointer;
+            text-transform: capitalize;
+        }
+
+        .topnav .box-top-l .meeting-room .room * {
+            pointer-events:none
+
+        }
+
+        @keyframes changeColor {
+            from {
+                background-color: #FF4040;
+            }
+            to {
+                background-color: #fc9797;
+            }
+        }
+        
+
+        .topnav .box-top-l .meeting-room .room-status {
+            background-color: #FF4040;
+            padding: 4px;
+            border-radius: 999rem;
+            border: 4px solid #e6e6e6;
+            position: fixed;
+            top: -8px;
+            left: 72px;
+            animation: changeColor .5s infinite alternate;
+            
+            transform: scale(0);
+            transition: transform 0.3s ease 0s; 
+        }
+
+        .topnav .box-top-l .meeting-room .room-status.active {
+            transform: scale(1);
+            transition: transform 0.5s var(--transition-cubic);
+        }
+
+        .dropdown {
+            position: fixed;
+            z-index: 9999;
+            /* left: 20px; */
+            padding: 10px 15px;
+            border-radius: 20px;
+            border: 1px solid var(--main-color);
+            width: fit-content;
+            background-color: #ffffff;
+
+        }
+
+        .meeting-room .room-dropdown {
+            top: 28px;
+            left: 76px;
+            transform-origin: top  ;
+            transform: scale(0);
+            transition: transform 0.3s ease 0s;   
+         
+            display: none;
+        }
+
+        .meeting-room .room-dropdown.enable {
+            display: block;
+
+        }  
+
+        .meeting-room .room-dropdown.active {
+            transform: scale(1);
+            transition: transform 0.5s var(--transition-cubic);
+         }
+
+        .dropdown li {
+            padding: 4px 5px;
+            font-size: .7rem;
+            max-width: 140px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--main-color);
+            display: flex;
+            align-items: center;
+            /* justify-content: center; */
+
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .dropdown li:hover {
+            color: #292929;
+        }
+
+        .topnav .box-top-c {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .topnav .box-top-r {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .topnav .box-top-r .menu-profile {
+            margin-right: 5px;
+        }
+
+        .main {
+            display: flex;       
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        .sidebar {
+            background-color: #F8F8F8;
+            position: fixed;
+            z-index: 900;
+            min-height: 100vh;
+            width: 225px;
+            padding: 70px 15px 15px 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+
+            transition:all .8s;
+            left: 0;
+        }
+
+        .sidebar .content-menu-dept {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .sidebar .content-menu-dept .header {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 0;
+        }
+
+        .sidebar .content-menu-dept .header .title {
+            background-color: #FFFFFF;
+            border: 2px solid #e6e6e6;
+            width: 100%;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+            font-size: 1.1rem;
+        }
+  
+        .sidebar .content-menu-dept .btn-all-dept {
+            font-size: .9rem;
+            padding: 10px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+
+        }
+
+        .sidebar .content-menu-dept .btn-all-dept .dept-reg {
+            background-color: #ffffff;
+            padding: 4px;
+            width: 15px;
+            height: 15px;
+            margin-right: 10px;
+            border: 3px solid #E6E6E6;
+            cursor: pointer;
+ 
+        }
+      
+        .sidebar .content-menu-dept .btn-all-dept.active .dept-reg::before {
+            font-family: FontAwesome;
+            display: inline-block;
+            background-size: contain;
+            float: left;
+            margin-top: -7px;
+            margin-left: -7px;
+            content: "\f00c";
+        }
+
+        .sidebar .content-menu-dept .btn-all-dept .dept-reg::before {
+            display: none;
+        }
+
+        
+        .sidebar .content-menu-dept .btn-nav-dept {
+            display: flex;
+            width: 100%;
+            padding: 3px;
+            border-radius: 20px;
+            border: 2px solid #ffffff00;
+            font-size: .7rem;
+            cursor: pointer;
+         }
+
+
+        .sidebar .content-menu-dept .btn-nav-dept:hover {
+            transition: all 0.5s ease 0s;
+            border: 2px solid var(--main-color);
+
+        }
+ 
+        .sidebar .content-menu-dept .btn-nav-dept:hover > .btn-nav-dept-name { 
+            transition: color 0.3s; 
+            color: #292929;
+            position: relative;
+        }
+
+        .sidebar .content-menu-dept .btn-nav-dept-icon {
+            margin-right: 0.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+        }
+
+        .sidebar .content-menu-dept .btn-nav-dept-icon .dept-radio  {
+            background-color: #dbdbdb;
+            padding: 4px;
+            border-radius: 999rem;
+            border: 4px solid #E6E6E6;
+        }
+
+        .sidebar .content-menu-dept .btn-nav-dept-icon .dept-radio.disable  {
+            background-color: #f84b4b;
+        }
+        
+        /* .sidebar .content-menu-dept .btn-nav-dept-icon .dept-radio.color-dept-engineer { transition: color 0.3s; background-color: var(--color-engineer) ;  }
+        .sidebar .content-menu-dept .btn-nav-dept-icon .dept-radio.color-dept-boiler { transition: color 0.3s; background-color: var(--color-boiler); }
+        .sidebar .content-menu-dept .btn-nav-dept-icon .dept-radio.color-dept-wastewater { transition: color 0.3s; background-color: var(--color-wastewater); }
+        .sidebar .content-menu-dept .btn-nav-dept-icon .dept-radio.color-dept-calibration { transition: color 0.3s; background-color: var(--color-calibration); }
+        .sidebar .content-menu-dept .btn-nav-dept-icon .dept-radio.color-dept-manufacture { transition: color 0.3s; background-color: var(--color-manufacture); }
+        .sidebar .content-menu-dept .btn-nav-dept-icon .dept-radio.color-dept-c-lab { transition: color 0.3s; background-color: var(--color-c-lab); }
+        .sidebar .content-menu-dept .btn-nav-dept-icon .dept-radio.color-dept-compound { transition: color 0.3s; background-color: var(--color-compound); }
+        .sidebar .content-menu-dept .btn-nav-dept-icon .dept-radio.color-dept-contain { transition: color 0.3s; background-color: var(--color-contain); }
+        .sidebar .content-menu-dept .btn-nav-dept-icon .dept-radio.color-dept-purchase { transition: color 0.3s; background-color: var(--color-purchase); }
+        .sidebar .content-menu-dept .btn-nav-dept-icon .dept-radio.color-dept-safety { transition: color 0.3s; background-color: var(--color-safety); }
+        .sidebar .content-menu-dept .btn-nav-dept-icon .dept-radio.color-dept-hr { transition: color 0.3s; background-color: var(--color-hr); } */
+
+
+        .sidebar .content-menu-dept .btn-nav-dept-name{
+            padding: 0 5px;
+            display: flex;
+            align-items: center;
+            
+        }
+                   
+        .sidebar .footer {
+            font-size: 0.7rem;
+            color: #cacaca;
+            letter-spacing: 3px;
+        }
+
+        .content {
+            min-height: 100vh;
+            width: 100%;
+            padding: 65px 15px 15px 15px;
+            /* transition:all .8s;             */
+      
+            margin-left: 225px;
+            transition-property: margin-left;
+            transition-duration: .8s;
+            background-color: #F8F8F8;
+             
+            background: 
+                repeating-radial-gradient(
+                circle at 0 0, 
+                #ffffff15,
+                #e6e6e618 90px
+                );
+            
+        }
+
+        @media screen and (max-width: 1000px) {
+
+            .topnav .box-top-l .meeting-room {
+                display: none;
+
+            }
+
+            .topnav .box-top-c {
+                display: none;
+            }
+
+            .content {
+                margin-left: 0;
+            }
+            
+
+            .sidebar {
+                left: -999px;
+            }
+
+
+        }
+
+        @media screen and (max-width: 600px) {
+
+        }
+
+        /* ///////////////calendar/////////////// */
+        ::-webkit-scrollbar {
+            background-color: transparent;
+            width: 0.5vw;
+            height: 0vw;
+        }
+
+        html:hover::-webkit-scrollbar,
+        body:hover::-webkit-scrollbar {
+            width: 0.5vw;
+            /* height: 0.5vh; */
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: rgba(185, 185, 185, 0.527);
+            border-radius: 100vw;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: #bbbbbb;
+            -webkit-box-shadow: rgba(255, 255, 255, 0.938) 0px 0px 50px;
+            box-shadow: rgba(255, 255, 255, 0.938) 0px 0px 50px;
+         }
+
+        ::-webkit-scrollbar-track {
+            background-color: rgba(224, 224, 224, 0.333);
+            border-radius: 100vw;
+            margin-block: 1em;
+         }
+
+        ::-webkit-scrollbar-track:hover {
+            background-color: rgba(224, 224, 224, 0.333);
+        }
+
+        @media (hover: none) {
+            ::-webkit-scrollbar {
+                width: 0.5vw;
+                /* height: 0.5vh; */
+            }
+            ::-webkit-scrollbar-thumb {
+                background-color: rgba(0, 0, 0, 0.2);
+            }
+        }
+        /* ::-webkit-scrollbar {
+            width: 10px;
+
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--main-bg );
+            box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d3d3d3;
+            border-radius: 3px;
+        }
+         */
+        .container-calendar {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            margin: 0 auto;
+            color: #fff;
+            display: flex;
+        }
+
+        .calendar {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            flex-wrap: wrap;
+            color: #878895;
+            background-color: #F8F8F8;
+        }
+        
+        .calendar .head-calendar {
+            width: 100%;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            text-transform: capitalize;
+        }
+        
+        .nav-right {
+            z-index: 999;
+            position: absolute;
+            width: fit-content;
+            display: flex;
+            align-items: center;
+            top: 74px;
+            right:15px ;
+            /* margin-left: auto; */
+        }
+
+        .nav-right i {
+            border-radius: 99px;
+            border: 1px solid var(--main-color);
+            margin: 0 5px;
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .nav-right i:hover {
+            color: var(--primary-clr);
+        }
+
+        .nav-right i:active {
+            color: #00A9FF;
+        }
+
+        .nav-right i.active {
+            color: #00A9FF;
+        }
+
+        .calendar .head-calendar .nav-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .calendar .head-calendar .prev,
+        .calendar .head-calendar .next {
+            cursor: pointer;
+            border-radius: 99px;
+            border: 1px solid var(--main-color);
+            margin: 0 5px;
+            padding: 2px;
+        }
+        .calendar .head-calendar .prev:hover,
+        .calendar .head-calendar .next:hover {
+            color: var(--primary-clr);
+        }
+
+        .calendar .head-calendar .today-btn-a {
+            cursor: pointer;
+            border-radius: 99px;
+            border: 1px solid var(--main-color);
+            margin: 0 5px;
+            padding: 2px 10px;
+            background-color: transparent;
+        }
+
+        .calendar .head-calendar .today-btn-a:hover {
+           color: #292929 ;
+        }
+
+        .calendar .head-calendar .date {
+            font-size: .8rem;
+            font-weight: 400;
+            padding: 2px 10px;
+            border-radius: 20px;
+            border: 1px solid var(--main-color);
+            margin-left: .6rem;
+        }
+
+        .calendar .weekdays {
+            width: 100%;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            /* padding: 0 20px; */
+            font-weight: 400;
+            text-transform: capitalize;
+            border: 1px solid var(--main-color);
+            border-bottom: 0px;
+
+        }
+        .weekdays div {
+            width: 14.28%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            font-size: .7rem;
+            padding: 10px;
+        }
+
+        .event-day {
+            height: 20px;
+            padding: .2rem .1rem;
+            margin-bottom: 5px;
+            width: calc( (100% * var(--eventSize)) +  (16px * (var(--eventSize) - 1) ));
+            border: 0;
+           
+            /* align-self: end; */
+            color: #F8F8F8;
+            background: var(--color-event);
+            box-shadow: 0 10px 14px var(--color-event);
+             
+            font-size: .65rem;
+            position: relative;
+            /* display: flex; */
+            /* align-items: center; */
+            z-index: 99999;
+            
+            border-radius: 4px;
+            border-left-style: solid;
+            border-left-width: 5px;
+            border-left-color: var(--color-event);
+ 
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+        }
+
+        .event-day.event-end {
+            border-left-style: solid;
+            border-left-width: 5px;
+            border-left-color: var(--color-event);
+            color: var(--txt-color);
+            box-shadow: 0 10px 14px var(--color-event);
+            backdrop-filter: blur(10px);
+            background: #ffffff2c;
+            z-index: 99999;
+        }
+
+        .event-day-end-date {
+            height: 20px;
+            padding: 0 8px;
+            width: 100%;
+            margin-bottom: 5px;
+            background: #ffffff00;
+        }
+
+ 
+        .calendar .days {
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            /* padding: 0 20px; */
+            font-size: .7rem;
+            font-weight: 500;
+            /* margin-bottom: 20px; */
+
+             /* opacity: 0.8; */
+            background-image:  radial-gradient(#999797 0.5px, transparent 0.5px), radial-gradient(#605f5f 0.5px, #F8F8F8 0.5px);
+            background-size: 20px 20px;
+            background-position: 0 0,10px 10px; 
+        }
+
+        .calendar .days .day {
+            width: 14.28%;
+            min-height: 15vh;
+            max-height: 15vh;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+            /* align-items: center; */
+            /* justify-content: center; */
+            cursor: pointer;
+            color: var(--txt-color);
+            border: 1px solid var(--main-color);
+            font-weight: 400;
+            padding: 8px;
+            background-color: #F8F8F8
+         }
+
+        .calendar .days .day.old {
+            background-color: #ffffff00;
+            pointer-events: none;
+        }
+
+        .calendar .days .day.old span {
+             pointer-events: auto;
+        }
+
+
+        .calendar .days .day:nth-child(7n + 1) {
+            border-left: 2px solid var(--main-color); 
+            color: #f8816c;
+        }
+        .calendar .days .day:nth-child(7n) {
+            border-right: 2px solid var(--main-color); 
+            color: #f8816c;
+        }
+        .calendar .days .day:nth-child(-n + 7) {
+            border-top: 2px solid var(--main-color);
+        }
+        .calendar .days .day:nth-child(n + 29) {
+            border-bottom: 2px solid var(--main-color); 
+        }
+
+        .calendar .days .day:not(.prev-date, .next-date):hover {
+            /* color: #fff;
+            background-color: var(--primary-clr); */
+        }
+        .calendar .days .prev-date,
+        .calendar .days .next-date {
+            /* color:  #f9f9fa; */
+            
+            color: #b3b3b3;
+            background-color: var(--second-bg);
+            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23F8F8F8' fill-opacity='1' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
+            /* cursor: not-allowed; */
+        }
+
+        .calendar .days .day.selected.active {
+            position: relative;
+            font-size: .9rem;
+
+            color: #fff;
+            background-color: var(--primary-clr);
+        }
+
+        .calendar .days .day.selected.active::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            box-shadow: 0 0 5px 2px var(--primary-clr);
+        }
+
+        /* ///////// active selected ///////////// */
+
+        div.day {
+            /* width: 30px;
+            border: 1px solid;
+            padding: 5px; */
+            user-select: none;
+        }
+
+        .calendar .days .day.selected {
+            background-color: #f0f0f0;
+        }
+      
+        .calendar .days .day.selected.first-selected.selected {
+            position: relative;
+            font-size: 1rem;
+            color: #fff;
+            border-radius: 20px 0 0 20px;
+            padding-left: 10px; 
+            background-color: var(--primary-clr);
+            transition:all .5s;
+
+         }
+
+        .calendar .days .day.selected.first-selected.selected::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 20px 0 0 20px;   
+            box-shadow: 0 0 5px 2px var(--primary-clr);
+    
+        }
+
+        .calendar .days .day.selected.last-selected {
+            position: relative;
+            font-size: 1rem;
+            color: #fff;
+            padding-left: 10px;       
+            background-color: var(--primary-clr);
+            border-radius: 0 20px 20px 0;
+            transition:all .5s;
+
+        }
+        .calendar .days .day.selected.last-selected::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            box-shadow: 0 0 5px 2px var(--primary-clr);
+            border-radius: 0 20px 20px 0;
+        }
+
+        
+
+
+   
+        /* ///////// active selected ///////////// */
+
+        .calendar .days .today {
+            font-size: .9rem;
+            color: #FF4040;
+            font-weight: 500;
+            background-color: #e5e5f7;
+            /* opacity: 0.8; */
+            background-image:  radial-gradient(#444cf7 0.5px, transparent 0.5px), radial-gradient(#444cf7 0.5px, #e5e5f7 0.5px);
+            background-size: 20px 20px;
+            background-position: 0 0,10px 10px; 
+
+        }
+
+        .calendar .days .today.active {
+            font-size: .9rem;
+            color: #ffffff;
+            font-weight: 500;
+
+        }
+ 
+        .calendar .goto-today {
+            width: 100%;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 5px;
+            padding: 0 20px;
+            margin-bottom: 20px;
+            color: var(--primary-clr);
+        }
+
+        @media screen and (max-width: 1000px) {
+            .content {
+              
+            }
+
+            .container-calendar {
+                background-color: #00A9FF;
+                /* height: 100%; */
+            }
+
+            .calendar .days .day {
+                
+            }
+        }
+
+        @media screen and (max-width: 600px) {
+            .content {
+
+            }
+
+            .container-calendar {
+                
+            }
+
+            .calendar .days .day {
+                /* height: 14vh;
+                min-height: 14vh; */
+            }
+        }
+
+
+
+        /* ///////////////////////////Heat Map/////////////////////////////// */
+        .container-heatmap {
+            font-size: .7rem;
+            font-family: 'Kanit', sans-serif;
+            width: max-content;
+            
+        }
+
+        .container-heatmap .heatmap {
+            border-collapse: separate;
+            border-spacing: 4px;
+            /* overflow: hidden; */
+            position: relative;
+         }
+
+        .head-heatmap {
+            width: 100%;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            text-transform: capitalize;
+        }
+
+        .head-heatmap .current-btn {
+            font-size: .8rem;
+            font-weight: 400;
+            padding: 2px 10px;
+            border-radius: 20px;
+            border: 1px solid var(--main-color);
+            margin-left: .6rem;
+            background-color: transparent;
+            cursor: pointer;
+        }
+
+        .head-heatmap .current-btn:hover {
+           color: #292929 ;
+        }
+
+        .head-heatmap .heatmap_nav-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .head-heatmap .heatmap_nav-left .heatmap_prev,
+        .head-heatmap .heatmap_nav-left .heatmap_next {
+            cursor: pointer;
+            border-radius: 99px;
+            border: 1px solid var(--main-color);
+            margin: 0 5px;
+            padding: 2px;
+            font-size: .9rem;
+        }
+
+        .head-heatmap .heatmap_nav-left .heatmap_prev:hover,
+        .head-heatmap .heatmap_nav-left .heatmap_next:hover {
+            color: var(--primary-clr);
+        }
+
+
+        .head-heatmap .heatmap_date {
+            font-size: .8rem;
+            font-weight: 400;
+            padding: 2px 10px;
+            border-radius: 20px;
+            border: 1px solid var(--main-color);
+            margin-left: .6rem;
+        }
+
+        /* //reponsive heatmap */
+        .content-heatmap {
+             overflow: auto;
+             padding-right: 50px;
+             /* width:  900px; */
+        }
+
+        .content-heatmap {
+            transform-origin: left  ;
+            transform: scale(1);
+            transition: transform 0.3s ease 0s;            
+        }
+
+        .box-heatmap {
+                     
+
+        }
+
+        .content-heatmap.active {
+            transform-origin: left ;
+            transform: scale(0);
+            transition: transform 0.5s var(--transition-cubic);
+            animation-delay: 250ms;            
+        }
+
+        .content-heatmap.displayNone {
+            display: none;
+
+        }
+
+        .title-heatmap {
+            margin: 10px 0;
+            font-size: 0.7rem;
+         }
+
+        .content-heatmap table {
+             width: 832px;
+        }
+
+        .container-heatmap .heatmap thead{
+            display: table-header-group;
+            vertical-align: middle;
+            border-color: inherit;
+        }
+
+
+        .container-heatmap .heatmap tbody td {
+            display: table-cell;
+            vertical-align: inherit;
+        } 
+
+        .container-heatmap .heatmap .months {
+            text-align: left;
+            height: 15px;
+            position: relative;
+            text-transform: capitalize;
+        }
+
+        .container-heatmap .heatmap .months td {
+            padding: 0.125em 0.5em 0.125em 0;
+
+        }
+
+        .container-heatmap .heatmap .months span {
+            font-weight: 400;
+            position: absolute;
+            top: 0;
+
+        }
+
+        .container-heatmap .heatmap .box-days {
+
+        }
+
+        .container-heatmap .heatmap .box-days .side-days {
+            padding: 0.125em 0.5em 0.125em 0;
+            position: relative;
+            text-transform: capitalize;
+        }
+
+        .container-heatmap .heatmap .box-days .side-days span {
+            clip-path: None;
+            position: absolute;
+            bottom: -1px;
+            left: 6px;
+        }
+
+        .container-heatmap .heatmap .box-days .heatmap_day {
+            background-color: #e6e6e6;
+            border-radius: 2px;
+            position: relative;
+            fill: #ebedf0;
+            outline:1px solid rgba(27, 31, 35, 0.06);
+            outline-offset: -1px;
+            cursor: pointer;
+            text-transform: capitalize;
+        }
+
+        .container-heatmap .heatmap .box-days .heatmap_day:hover:before {
+            content: var(--title);
+            position: absolute;
+            background-color: rgb(255, 255, 255);
+            padding: 4px 8px;
+            top: -36px;
+            left: -30px;
+            border-radius: 4px;
+            box-shadow: 0 0 4px 2px rgba(0, 0, 0, 0.1);
+            z-index: 999;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .container-heatmap .heatmap .box-days .heatmap_day:hover:after {
+            content: "";
+            position: absolute;
+            width: 0;
+            height: 0;
+            top: -13px;
+            left: -2px;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 10px solid rgb(255, 255, 255);
+            z-index: 999;
+        }
+
+        .leng-color {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            height: 26px;
+          }
+
+        .leng-color div:not(.color .color-box) {
+             margin: 0 5px;
+        }
+
+        .leng-color .less {
+
+        }
+
+        .leng-color .color {
+            display: flex;
+        }
+
+        .leng-color .color .color-box {
+            height: 13px;
+            width: 13px;
+            margin: 0 1px;
+            border-radius: 2px;
+            background-color: #e6e6e6;
+            position: relative;
+            fill: #ebedf0;
+            outline:1px solid rgba(27, 31, 35, 0.06);
+            outline-offset: -1px;
+        }
+
+        .leng-color .more {
+
+        }
+
+
+        /* ///////////////event dialog///////////// */
+
+        .event-dialog {
+            /* background-color: #29292934; */
+            position: absolute;
+            overflow: auto;
+            z-index: 99999;
+            width: 100%;
+            height: 100vh;
+          
+            display: none;
+            /* display: flex;
+            justify-content: center; */
+        }
+        .event-dialog.active {
+            display: flex;
+            justify-content: center;
+        }
+
+        .event {
+            background-color:var( --main-color);
+            margin: 30px 0;
+            width: 550px;
+            height: fit-content;
+            font-size: .7rem;
+            border-radius: 20px;
+            box-shadow:var(--box-shadow);
+            padding: 30px 25px;
+
+            transform: scale(0)  ;
+            transform-origin:   top ;
+            transition: transform 0.3s ease 0s; 
+
+        }
+
+        .event .bx-x {
+         
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+
+        /* .event::before {
+            font-family: FontAwesome;
+            content: "\f00d"; 
+            position: absolute;
+            right: 25px;
+            top: 20px;
+            font-size: 1.1rem;
+            cursor: pointer;
+        } */
+
+        .event.active {
+            transform: scale(1);
+            transition: transform 0.5s var(--transition-cubic);
+        }
+
+        .event div {
+            transition: all 0.8s  ;
+
+        }
+        
+        .event .header {
+            padding: 5px 0;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+        }
+
+        .event .content-input {
+
+        }
+
+        .event .content-input .input-step-1 {
+            /* padding: 10px 0; */
+            display: flex;
+        }
+
+        
+        .event .content-input .input-step-1 .selectroom * {
+            pointer-events:none
+
+        }
+        
+        .event .content-input .input-step-1 .selectroom-dropdown {
+            left: 70px;
+            max-height: 55vh;
+            overflow: auto; 
+            width: fit-content;
+            transform-origin: top  ;
+            transform: scale(0);
+            /* transition: transform 0.3s ease 0s;    */
+            display: none;
+
+        }   
+
+        .event .content-input .input-step-1 .selectroom-dropdown.enable {
+            display: block;
+
+        }  
+
+        .event .content-input .input-step-1 .selectroom-dropdown.active {
+            transform: scale(1);
+            transition: transform 0.5s var(--transition-cubic);            
+
+        }
+
+        .event .content-input .input-step-1 .selectdept * {
+            pointer-events:none
+
+        }
+
+        .event .content-input .input-step-1 .selectdept-input::before {
+            content: "";
+            background-color: var(--color-dept);
+            padding: 4px;
+            margin-right: 5px;
+            border-radius: 999rem;
+            border: 4px solid #E6E6E6; 
+        }
+  
+
+        .event .content-input .input-step-1 .selectdept-dropdown {
+            left: 260px;
+            max-height: 55vh;
+            overflow: auto; 
+            width: fit-content;
+            transform-origin: top  ;
+            transform: scale(0);
+            transition: transform 0.3s ease 0s;  
+            display: none;
+
+        }   
+
+        .event .content-input .input-step-1 .selectdept-dropdown.enable {
+            display: block;
+
+        }  
+
+        .event .content-input .input-step-1 .selectdept-dropdown.active {
+            transform: scale(1);
+            transition: transform 0.5s var(--transition-cubic);
+        }
+
+        .event .content-input .input-step-1 span {
+            background-color: #f8fafd77;
+            width: 170px;
+            height: 40px;
+            margin-right: 20px ;
+            border-radius: 20px;
+            border: 2px solid #e6e6e6; 
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: .7rem;
+            padding: 5px 15px;
+        }
+        
+       
+        .event .content-input .input-step-1 span:not(.title-selectroom span)::after {
+            font-family: FontAwesome;
+            content: "\f054"; 
+            border: 2px solid #e6e6e6;
+            /* padding: 5px; */
+            height: 20px;
+            width: 20px;
+            border-radius: 999px;
+            transform: rotate(90deg);
+            position: relative;
+            left:7px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .event .content-input .input-step-1 span:hover::after {
+            color: var(--primary-clr);
+
+        }
+
+        .event .content-input .input-step-1 span label {
+            width: 110px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .event .content-input .input-step-2 {
+            padding: 10px 0;
+
+         }
+
+        .box-input {
+            /* padding: 10px 0; */
+            margin-top: 10px;
+        }
+
+        .box-input p {
+            padding-bottom: 5px ; 
+        }
+
+        .box-input div:not(.timeleng.box-input div ) {
+            border-radius: 20px;
+            min-height: 40px;
+            border: 2px solid #e6e6e6;
+            padding: 5px 15px;
+            background-color: #f8fafd77;
+            display: flex;
+            align-items: center;
+
+         }
+
+        .box-input input {
+            border: 2px solid #e6e6e600;
+            font-size: .7rem;
+            outline: none; 
+            background-color: #256dd800;
+            color: var(--txt-color);
+            width: 100%;
+        }
+
+        textarea:valid {
+            border: 2px solid #e6e6e600;
+            background-color: #0054d100;
+            outline: none; 
+            padding: 5px 0;
+            font-size: .7rem;
+
+        }
+
+        textarea {
+            resize: none;
+        }
+ 
+        .event .content-input .input-step-2 .timeleng  { 
+            margin-top: 15px;
+        }
+
+        .event .content-input .input-step-2 .timeleng .leng { 
+            display: flex;
+        }
+
+        
+        .event .content-input .input-step-2 .timeleng .leng p { 
+            font-size: .7rem;
+            padding-bottom:0;
+            padding-right: 5px;
+        }
+
+        .event .content-input .input-step-2 .timeleng .leng div { 
+            margin-right: 20px ; 
+
+        }
+
+        .event .content-input .input-step-2 .timeleng .leng div div { 
+            border-radius: 20px;
+            min-height: 40px;
+            border: 2px solid #e6e6e6;
+            padding: 5px 15px;
+            background-color: #f8fafd77;
+            display: flex;
+            align-items: center;
+ 
+        }
+
+        .event .content-input .input-step-2 .timeleng .leng div div label { 
+            width: fit-content;
+            white-space: nowrap;
+        }
+
+        .event .content-input .input-step-2 .timeleng .text-startdate::before { 
+            font-family: FontAwesome;
+            content: "\f133";
+            margin-right: 10px;
+
+        }
+
+        .event .content-input .input-step-2 .timeleng .leng div div label::after { 
+            content: ":";
+            margin: 0 5px;
+        }
+
+        input[type=time] {
+            border: none;
+            width: 100px;
+        }
+
+        input[type=time]::after{
+            font-family: FontAwesome;
+            content: "\f017";
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        input[type=time]::-webkit-datetime-edit-fields-wrapper {
+            display: flex;
+        }
+
+        input[type=time]::-webkit-datetime-edit-text {
+            padding: 5px 7px;
+         }
+
+        input[type=time]::-webkit-datetime-edit-hour-field {
+            background-color: var(--main-color);
+            border-radius: 15%;
+            padding: 5px 7px;
+            color: var(--txt-color);
+            cursor: pointer;
+
+        }
+
+        input[type=time]::-webkit-datetime-edit-hour-field:focus {
+            background-color: var(--main-bg);
+        }
+
+        input[type=time]::-webkit-datetime-edit-minute-field {
+            background-color: var(--main-color);
+            border-radius: 15%;
+            padding: 5px 7px;
+            color: var(--txt-color);
+            cursor: pointer;
+        }
+
+        input[type=time]::-webkit-datetime-edit-minute-field:focus {
+            background-color: var(--main-bg);
+
+
+        }
+
+        input[type=time]::-webkit-datetime-edit-ampm-field {
+            border-radius: 15%;
+            padding: 5px 7px;
+        }
+
+        input[type=time]::-webkit-clear-button {
+            display: none;            
+
+        }
+
+        input[type=time]::-webkit-inner-spin-button {
+            display: none;           
+
+        }
+
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            display: none;
+        }
+
+
+        input[type="date"] {
+            color: var(--txt-color);
+         }
+
+        input[type="date"]::-webkit-datetime-edit { 
+            /* padding: 1em;  */
+        }
+
+        input[type="date"]::-webkit-datetime-edit-fields-wrapper { 
+
+        }
+        
+        input[type="date"]::-webkit-datetime-edit-text { 
+            padding: 5px 7px;
+        }
+   
+        input[type=date]::-webkit-datetime-edit-day-field:focus {
+            background-color: var(--main-bg);
+        }
+
+        input[type=date]::-webkit-datetime-edit-month-field:focus {
+            background-color: var(--main-bg);
+        }
+
+        input[type=date]::-webkit-datetime-edit-year-field:focus {
+            background-color: var(--main-bg);
+        }
+
+        input[type="date"]::-webkit-datetime-edit-month-field { 
+            background-color: var(--main-color);
+            border-radius: 15%;
+            padding: 5px 7px;
+            color: var(--txt-color);
+            cursor: pointer;
+        }
+
+        input[type="date"]::-webkit-datetime-edit-day-field { 
+            background-color: var(--main-color);
+            border-radius: 15%;
+            padding: 5px 7px;
+            color: var(--txt-color);
+            cursor: pointer;
+        }
+        
+        input[type="date"]::-webkit-datetime-edit-year-field { 
+            background-color: var(--main-color);
+            border-radius: 15%;
+            padding: 5px 7px;
+            color: var(--txt-color);
+            cursor: pointer;
+        }
+
+        input[type="date"]::after{
+            font-family: FontAwesome;
+            content: "\f133";
+            font-size: 1rem;
+            cursor: pointer;             
+        }
+
+        input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+            display: flex;    
+         }
+
+        input[type="date"]::-webkit-clear-button {
+            display: none;            
+        }
+
+        input[type="date"]::-webkit-inner-spin-button {
+            display: none;           
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            display: none;
+        }
+
+    
+ 
+        .event .content-input .input-step-2 .box-input .list {
+            height: 130px;
+            width: 100%;
+        }
+
+        .event .content-input .input-step-2 .accessories div {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            padding: 10px 15px;
+        }
+        
+        .event .content-input .input-step-2 .accessories nav {
+            display: flex;
+            width:  fit-content;
+            white-space: nowrap; 
+         }
+
+        .event .content-input .input-step-2 .accessories nav input {
+            border: 2px solid #e6e6e600;
+            font-size: .7rem;
+            outline: none; 
+            background-color: #256dd800;
+            color: var(--txt-color);
+            height: 20px;
+            padding: 0 10px;
+         }
+
+         .event .content-input .input-step-2 .accessories nav label {
+            color: var(--txt-color);
+            padding: 0 10px;
+         }
+
+        .event .footer {
+            display: flex;
+            justify-content: flex-end;
+         }
+
+        .box-button input {
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 2px solid #e6e6e6;
+            text-transform: capitalize;
+            cursor: pointer;
+        }
+        
+        .box-button input:hover {
+            transition: all 0.5s ease 0s;
+            color: #00A9FF;
+
+        }
+
+        .box-input .alert-input {
+            font-size: .6rem;
+            display: none;
+        }
+
+        .box-input .alert-input.active {
+            display: block;
+
+        }
+
+        .box-input .alert-input::before {
+            font-family: FontAwesome;
+            content: "\f12a";
+            color: #FF4040;
+            padding: 0 5px;
+        }
+
+        @media screen and (max-width: 1000px) {
+            .event-dialog {
+
+            }
+
+            .event {
+                margin: 20px;
+             }
+
+           
+        }
+
+        @media screen and (max-width: 600px) {
+            .event-dialog {
+
+            }
+
+            .event {
+                width: 95%;
+            }
+
+            .event-day {
+                height: 7px;
+                font-size: .3rem;
+                position: 0;
+            }
+
+           
+        }
+
+        .DisplayNone {
+            display: none;
+        }
+        
+
+
+        .content-edit-dialogMove {
+            position: absolute;
+            overflow: auto;
+            z-index: 99999;
+            width: 100%;
+            height: 100vh;
+            display: none;
+        }
+        .content-edit-dialogMove.active {
+            display: flex;
+            justify-content: center;
+        }
+
+        .content-edit {
+            background-color:var( --main-color);
+            width: 470px;
+            height: fit-content;
+            font-size: .7rem;
+            border-radius: 20px;
+            box-shadow:var(--box-shadow);
+            padding: 30px 25px;
+            margin-top: 10px;
+            transform: scale(0);
+            transform-origin:   top;
+            transition: transform 0.3s ease 0s;
+        }
+
+        .content-edit .content-name-edit:after {
+            content: "edit";
+            position: absolute;
+            line-height: 10px;
+            left: 121px;
+            font-size: .5rem;
+            text-transform: capitalize;
+            border: 2px solid var(--second-bg);
+            border-radius: 5px;
+            padding: 2px 4px;
+            z-index: 99999;
+            
+        }
+
+        .content-edit .bx-x {
+        
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+
+        /* .content-edit::before {
+            font-family: FontAwesome;
+            content: "\f00d"; 
+            position: absolute;
+            right: 25px;
+            top: 20px;
+            font-size: 1.1rem;
+            cursor: pointer;
+        } */
+
+        .content-edit.active {
+            transform: scale(1);
+            transition: transform 0.5s var(--transition-cubic);
+        }
+
+        .content-edit div {
+            transition: all 0.8s  ;
+
+        }
+        
+        .content-edit .header {
+            padding: 10px 0;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+        }
+
+        .content-edit .content-detail-edit {
+
+        }
+
+        .content-edit .content-detail-edit .input-step-1 {
+            display: flex;
+            margin-bottom: 10px;
+
+        }
+
+        
+        .content-edit .content-detail-edit .input-step-1 .selectroom * {
+            pointer-content-edits:none
+
+        }
+        
+        .content-edit .content-detail-edit .input-step-1 .selectroom-dropdown-edit {
+            left: 70px;
+            max-height: 55vh;
+            overflow: auto; 
+            width: fit-content;
+            transform-origin: top  ;
+            transform: scale(0);
+            transition: transform 0.3s ease 0s;  
+            display: none;
+
+        }   
+
+        .content-edit .content-detail-edit .input-step-1 .selectroom-dropdown-edit.enable {
+            display: block;
+
+        }  
+
+        .content-edit .content-detail-edit .input-step-1 .selectroom-dropdown-edit.active {
+            transform: scale(1);
+            transition: transform 0.5s var(--transition-cubic);            
+
+        }
+
+    
+        .content-edit .content-detail-edit .input-step-1 .selectdept-input-edit::before {
+            content: "";
+            background-color: var(--color-dept);
+            padding: 4px;
+            margin-right: 5px;
+            border-radius: 999rem;
+            border: 4px solid #E6E6E6; 
+        }
+
+
+        .content-edit .content-detail-edit .input-step-1 .selectdept-dropdown-edit {
+            left: 260px;
+            max-height: 55vh;
+            overflow: auto; 
+            width: fit-content;
+            transform-origin: top  ;
+            transform: scale(0);
+            transition: transform 0.3s ease 0s;  
+            display: none;
+
+        }   
+
+        .content-edit .content-detail-edit .input-step-1 .selectdept-dropdown-edit.enable {
+            display: block;
+
+        }  
+
+        .content-edit .content-detail-edit .input-step-1 .selectdept-dropdown-edit.active {
+            transform: scale(1);
+            transition: transform 0.5s var(--transition-cubic);
+        }
+
+        .content-edit .content-detail-edit .input-step-1 span {
+            background-color: #f8fafd77;
+            width: 170px;
+            height: 40px;
+            margin-right: 20px;
+            border-radius: 20px;
+            border: 2px solid #e6e6e6;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: .7rem;
+            padding: 5px 15px;
+        }
+        
+    
+        .content-edit .content-detail-edit .input-step-1 span::after {
+            font-family: FontAwesome;
+            content: "\f054"; 
+            border: 2px solid #e6e6e6;
+            /* padding: 5px; */
+            height: 20px;
+            width: 20px;
+            border-radius: 999px;
+            transform: rotate(90deg);
+            position: relative;
+            left:7px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .content-edit .content-detail-edit .input-step-1 span:hover::after {
+            color: var(--primary-clr);
+
+        }
+
+        .content-edit .content-detail-edit .input-step-1 span label {
+            width: 110px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .content-edit .content-detail-edit .input-step-2 {
+            /* padding: 10px 0; */
+
+        }
+
+        .content-edit .content-detail-edit .input-step-2 .timeleng .leng { 
+            display: flex;
+        }
+
+        
+        .content-edit .content-detail-edit .input-step-2 .timeleng .leng p { 
+            font-size: .8rem;
+            padding-bottom:0;
+            padding-right: 5px;
+        }
+
+        .content-edit .content-detail-edit .input-step-2 .timeleng .leng div { 
+            margin-right: 20px ; 
+
+        }
+
+        .content-edit .content-detail-edit .input-step-2 .timeleng .leng div div { 
+            border-radius: 20px;
+            min-height: 40px;
+            border: 2px solid #e6e6e6;
+            padding: 5px 15px;
+            background-color: #f8fafd77;
+            display: flex;
+            align-items: center;
+
+        }
+
+        .content-edit .content-detail-edit .input-step-2 .timeleng .leng div div label { 
+            width: fit-content;
+            white-space: nowrap;
+        }
+
+        .content-edit .content-detail-edit .input-step-2 .timeleng .text-startdate::before { 
+            font-family: FontAwesome;
+            content: "\f133";
+            margin-right: 10px;
+
+        }
+
+        .content-edit .content-detail-edit .input-step-2 .timeleng .leng div div label::after { 
+            content: ":";
+            margin: 0 5px;
+        }
+
+        .content-edit .content-detail-edit .input-step-2 .box-input .list {
+            height: 130px;
+            width: 100%;
+        }
+
+        .content-edit .content-detail-edit .input-step-2 .accessories div {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            padding: 10px 15px;
+        }
+        
+        .content-edit .content-detail-edit .input-step-2 .accessories nav {
+            display: flex;
+            width:  fit-content;
+            white-space: nowrap; 
+        }
+
+        .content-edit .content-detail-edit .input-step-2 .accessories nav input {
+            border: 2px solid #e6e6e600;
+            font-size: .8rem;
+            outline: none; 
+            background-color: #256dd800;
+            color: var(--txt-color);
+            height: 20px;
+            padding: 0 10px;
+        }
+
+        .content-edit .content-detail-edit .input-step-2 .accessories nav label {
+            color: var(--txt-color);
+            padding: 0 10px;
+        }
+
+        .content-edit .footer {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+
+        @media screen and (max-width: 1000px) {
+            .content-edit-dialog {
+
+            }
+
+            .content-edit {
+                margin: 20px;
+            }
+
+        
+        }
+
+        @media screen and (max-width: 600px) {
+            .content-edit-dialog {
+
+            }
+
+            .content-edit {
+                width: 95%;
+            }
+
+            .content-edit-day {
+                height: 7px;
+                font-size: .3rem;
+                position: 0;
+            }
+
+        
+        }
+
+        .event-tool {
+            font-size: .65rem;
+            /* height: 20vh;
+            width: 15vw; */
+
+            /* height: 144px; */
+            height: fit-content;
+            width: 225px;
+            position: absolute;
+            background-color: var(--main-bg);
+            padding: 15px 20px; 
+            border-radius: 20px;
+            box-shadow: 0 0 4px 2px rgba(0, 0, 0, 0.1);
+            z-index: 99999;
+            align-self: baseline;
+
+            display: none;
+            flex-direction: column;
+        }
+
+        .event-tool div {
+            display: flex;
+            align-items: center;
+            margin: 2px 0;
+        }
+
+        .event-tool .room::before {
+            font-family: FontAwesome;
+            content: "\f024";
+            padding-right: 5px;
+            color:  #888888;
+            width: 10px;
+
+        }
+
+        .event-tool .datetime label:first-child::before  {
+            font-family: FontAwesome;
+            content: "\f133";
+            padding-right: 5px;
+            color:  #888888;
+            width: 10px;
+
+        }
+        
+        .event-tool .datetime label:nth-last-child(1)::before {
+            font-family: FontAwesome;
+            content: "\f017";
+            padding-right: 5px;
+            color:  #888888;
+            width: 10px;
+
+        }
+        
+        .event-tool .planner::before {
+            font-family: FontAwesome;
+            content: "\f007";
+            padding-right: 5px;
+            width: 10px;
+            color:  #888888;
+            width: 10px;
+
+        }
+
+        .event-tool .dept::before {
+            font-family: FontAwesome;
+            content: "\f0c0";
+            padding-right: 5px;
+            color:  #888888;
+            width: 10px;
+
+        }
+
+        .event-tool .content-btn {
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .event-tool .content-btn input {
+            
+            font-size: .65rem;
+            width: 85px;
+            padding: 2px 5px;
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 2px solid #e6e6e6;
+            text-transform: capitalize;
+            cursor: pointer;
+        }
+
+        .event-tool .content-btn input label {
+            pointer-events: none;
+        }
+
+        .event-tool .content-btn .event-edit {
+            
+        }
+
+        .event-tool .content-btn .event-cancel {
+            
+        }
+        
+        .event-tool-after {
+            content: "";
+            position: absolute;
+            width: 0;
+            height: 0; 
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 10px solid rgb(255, 255, 255);
+            z-index: 99999;
+
+            display: none;
+        }
+
+        .backdrop-alert {
+            /* background-color: #29292934; */
+            position: absolute;
+            overflow: auto;
+            z-index: 99999;
+            width: 100%;
+            height: 100vh;
+
+            /* display: flex; */
+            justify-content: center;
+            align-items: center;
+            
+            display: none;
+
+        }
+
+        .alert-message {
+            background-color: var(--main-color);
+            margin: 30px 0;
+            width: 400px;
+            /* height: 200px; */
+            font-size: .8rem;
+            border-radius: 20px;
+            box-shadow: var(--box-shadow);
+            padding: 15px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .alert-message div {
+            width: 100%;
+            display: flex;
+        }
+
+        .alert-message .header {
+            justify-content: space-between;
+        }
+
+        .alert-message .header label {
+            text-align: center;
+            line-height: 5px;
+            height: 17px;
+            width: 17px;
+            padding: 5px;
+            border-radius: 99px;
+            border: 1px solid #c1c1c1;
+        }
+
+        .alert-message .header i {
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .alert-message .detail {
+            background-color: var(--second-bg);
+            font-size: .7rem;
+            height: 60px;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 10px;
+
+        }
+
+        .alert-message .content-btn {
+            justify-content: flex-end;
+
+        }
+
+        .alert-message .content-btn input {
+             width: 85px;
+            padding: 2px 5px;
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 2px solid #e6e6e6;
+            text-transform: capitalize;
+            cursor: pointer;
+        }
+
+        .alert-message .content-btn input label {
+            pointer-events: none;
+        }
+
+        .dispointer {
+            pointer-events: none;
+        }
+
+    </style>
+</head>
+<body>
+ 
+    <div class="container">
+        <div class='nav-right'>
+            <i class='bx bx-calendar-event active' onclick="renderPageCalendar()"></i>
+            <i class='bx bx-grid-horizontal' onclick="renderPageHeatMap()"> </i>
+            <!-- <i class='bx bxs-bar-chart-alt-2' onclick="renderPageChart()" ></i> -->
+        </div>
+        <div class="topnav">
+            <div class="box-top-l">
+                <div class="pj-name-logo">
+                    MEETING PLANNER
+                </div>
+                <div class="meeting-room">
+                    <i class='bx bx-chevron-left roomPrev' onclick="prevRoom()"></i>
+                    <i class='bx bx-chevron-right roomNext' onclick="nextRoom()"></i>
+                    <div class="room" type="button" onclick="roomDropdownMenu()" ><label id="room-input-label">Meeting Room 1</label><div class="room-status"></div></div>
+                    <input type="text" name="room-input-name" id="room-input" class="DisplayNone">
+                    <span class="room-dropdown dropdown">
+                        <ul>
+                            <!-- <li class="room-input" name="Meeting Room 1">Meeting Room 1</li>
+                            <li class="room-input" name="Meeting Room 2">Meeting Room 2</li>
+                            <li class="room-input" name="Meeting Room 3">Meeting Room 3</li>
+                            <li class="room-input" name="Meeting Room 4">Meeting Room 4</li>
+                            <li class="room-input" name="Meeting Room 5">Meeting Room 5</li>
+                            <li class="room-input" name="Meeting Room 6">Meeting Room 6</li>
+                            <li class="room-input" name="Meeting Room 7">Meeting Room 7</li> -->
+                        </ul>
+                    </span>
+                </div>
+            </div>
+            <div class="box-top-c"></div>
+            <div class="box-top-r">
+                <div class="menu-profile">
+                    profile name
+                </div>
+                <i class='bx bx-log-out'></i>
+            </div>
+        </div>
+        <div class="main">
+            <div class="sidebar">
+                <div class="content-menu-dept">
+                    <div class="header">
+                        <div class="title">แผนก</div>
+                    </div>
+                    <div class="btn-all-dept" onclick="togglecheckAll()">
+                        <i class='dept-reg'></i>
+                        all
+                    </div>
+                    <div class="nav-content">
+
+                    </div>
+                    
+                </div>
+                <div class="footer">@hv-fila</div>
+            </div>
+        
+            <div class="content">
+             
+            </div>
+
+            <div class="event-dialog">
+                <form id="form" class="event" method="post" autocomplete="off">
+                    <i class='bx bx-x' onclick="inactiveDialog()"></i>
+                    <div class="header">
+                        <div class="content-name">Schedule</div>
+                    </div>
+                    <div class="content-input">
+                        <div class="input-step-1 ">
+                            <div class="title-selectroom box-input">
+                                <p class="title">ห้องประชุม</p>
+                                <span class="selectroom" onclick="selectRoomDropdownMenu()" ><label id="selectroom-input-label">เลือกห้องประชุม</label></span>
+                                <input type="text" name="mrid" id="selectroom-input" class="DisplayNone">
+                                <nav class="selectroom-dropdown dropdown">
+                                    <ul>
+                                        <!-- <li class="selectroom-input" name="Meeting Room 1">Meeting Room 1</li>
+                                        <li class="selectroom-input" name="Meeting Room 2">Meeting Room 2</li>
+                                        <li class="selectroom-input" name="Meeting Room 3">Meeting Room 3</li>
+                                        <li class="selectroom-input" name="Meeting Room 4">Meeting Room 4</li>
+                                        <li class="selectroom-input" name="Meeting Room 5">Meeting Room 5</li>
+                                        <li class="selectroom-input" name="Meeting Room 6">Meeting Room 6</li>
+                                        <li class="selectroom-input" name="Meeting Room 7">Meeting Room 7</li> -->
+                                    </ul>
+                                </nav>
+                            </div>
+                            <div class="title-selectdept box-input">
+                                <p class="title">แผนก</p>
+                                <span class="selectdept" onclick="selectDeptDropdownMenu()"><label id="selectdept-input-label" >เลือกแผนก</label></span>
+                                <input type="text" name="deptid" id="selectdept-input" class="DisplayNone">
+                                <nav class="alert-input" id="deptid">กรุณาระบุแผนก</nav>
+                                <nav class="selectdept-dropdown dropdown">  
+                                    <ul>
+                                        <!-- <li class="selectdept-input" name="Meeting Room 1">Meeting Room 1</li>
+                                        <li class="selectdept-input" name="Meeting Room 2">Meeting Room 2</li>
+                                        <li class="selectdept-input" name="Meeting Room 3">Meeting Room 3</li>
+                                        <li class="selectdept-input" name="Meeting Room 4">Meeting Room 4</li>
+                                        <li class="selectdept-input" name="Meeting Room 5">Meeting Room 5</li>
+                                        <li class="selectdept-input" name="Meeting Room 6">Meeting Room 6</li>
+                                        <li class="selectdept-input" name="Meeting Room 7">Meeting Room 7</li> -->
+                                    </ul>
+                                </nav>
+                            </div>
+                         </div>
+                        <div class="input-step-2">
+                            <div class="planner box-input">
+                                <p class="title">ผู้นัดหมาย</p>
+                                <div>
+                                    <input type="text" name="planner"  placeholder="กรอกข้อมูล . . .">
+                                </div>
+                                <span class="alert-input" id="planner">กรุณาระบุชื่อผู้นัดหมาย</span>
+                            </div>
+                            <div class="title-meet box-input">
+                                <p class="title">หัวข้อการประชุม</p>
+                                <div>
+                                    <input type="text" name="title" placeholder="กรอกข้อมูล . . .">
+                                </div>
+                                <span class="alert-input" id="title">กรุณาระบุหัวข้อการประชุม</span>
+
+                            </div>
+                            <div class="detail box-input">
+                                <p class="title">รายละเอียดการประชุม</p>
+                                <div>
+                                    <textarea name="detail" rows="3" cols="65" placeholder=" . . ."></textarea>
+                                </div>
+                            </div>
+                            <div class="timeleng box-input">
+                                <p class="text-startdate">วัน/เดือน/ปี</p>
+                                <input type="text" name="date" id="date" class="DisplayNone">
+                                <input type="text" name="datef" id="datef" class="DisplayNone" value="">
+
+                                <p class="title">ระยะเวลา</p>
+                                <div class="leng">
+                                    <div class="startdate"><i class=""></i>
+                                        <div>
+                                            <label>เริ่มประชุม</label><input type="time" value="10:00"  name="startdate">
+                                        </div>
+                                    </div> 
+                                    <div class="enddate"><i class=""></i> 
+                                        <div>
+                                            <label>สิ้นสุด</label><input type="time" value="17:00"  name="enddate">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- <div class="allday"></div> -->
+                            </div>
+                            <!-- <div class="addlist box-input">
+                                <p class="title">รายชื่อผู้เข้าร่วมประชุม</p>
+                                <div>
+                                    <input type="text">
+                                </div>
+                             </div> -->
+                            <div class="accessories box-input">
+                                <p class="title">รายการอุปกรณ์เสริม</p>
+                                <div>
+                                    <nav>
+                                        <input type="checkbox" id="item1" name="item1" value="Bike">
+                                        <label for="item1">item 1</label><br>
+                                    </nav>
+                                    <nav>
+                                        <input type="checkbox" id="item2" name="item2" value="Car">
+                                        <label for="item2">item 2</label><br>
+                                    </nav>
+                                    <nav>
+                                        <input type="checkbox" id="item3" name="item3" value="Boat">
+                                        <label for="item3">item 3</label><br><br>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="footer">
+                        <div class="box-button">
+                            <!-- <button type="submit">submit</button> -->
+                            <input type="submit" value="submit">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        
+            <div class="content-edit-dialogMove ">
+                <form id="form-edit" class="content-edit" method="post" autocomplete="off">
+                    <i class='bx bx-x' onclick="inactiveDialogEdit()"></i>
+                    <div class="header">
+                        <div class="content-name-edit">Schedule</div>
+                    </div>
+                    <input type="text" name="planid" id="planid" class="DisplayNone">
+                    {{-- <input type="text" name="appointid" id="appointid" class="DisplayNone"> --}}
+                    <input type="text" name="planner-edit" id="planner-edit" class="DisplayNone">
+
+                    <div class="content-detail-edit">
+                        <div class="input-step-1">
+                            <div class="title-selectroom box-input"> 
+                                <p class="title">ห้องประชุม</p>
+                                <span class="selectroom-edit"  onclick="selectRoomDropdownMenuEdit()" ><label id="selectroom-input-edit-label">เลือกห้องประชุม</label></span>
+                                <input type="text" name="mrid-edit" id="selectroom-input-edit" class="DisplayNone">
+                                <nav class="alert-input mrid-edit">กรุณาระบุห้องประชุม</nav>
+                                <nav class="selectroom-dropdown-edit dropdown">
+                                    <ul>
+                                        <!-- <li class="selectroom-input-edit" name="Meeting Room 1">Meeting Room 1</li>
+                                        <li class="selectroom-input-edit" name="Meeting Room 2">Meeting Room 2</li>
+                                        <li class="selectroom-input-edit" name="Meeting Room 3">Meeting Room 3</li>
+                                        <li class="selectroom-input-edit" name="Meeting Room 4">Meeting Room 4</li>
+                                        <li class="selectroom-input-edit" name="Meeting Room 5">Meeting Room 5</li>
+                                        <li class="selectroom-input-edit" name="Meeting Room 6">Meeting Room 6</li>
+                                        <li class="selectroom-input-edit" name="Meeting Room 7">Meeting Room 7</li> -->
+                                    </ul>
+                                </nav>
+                            </div>
+                            <div class="title-selectdept box-input">
+                                <p class="title">แผนก</p>
+                                <span class="selectdept-edit"  onclick="selectDeptDropdownMenuEdit()"><label id="selectdept-input-edit-label" >เลือกแผนก</label></span>
+                                <input type="text" name="deptid-edit" id="selectdept-input-edit" class="DisplayNone">
+                                <nav class="alert-input deptid-edit">กรุณาระบุแผนก</nav>
+                                <nav class="selectdept-dropdown-edit dropdown">  
+                                    <ul>
+                                        <!-- <li class="selectdept-input-edit" name="Meeting Room 1">Meeting Room 1</li>
+                                        <li class="selectdept-input-edit" name="Meeting Room 2">Meeting Room 2</li>
+                                        <li class="selectdept-input-edit" name="Meeting Room 3">Meeting Room 3</li>
+                                        <li class="selectdept-input-edit" name="Meeting Room 4">Meeting Room 4</li>
+                                        <li class="selectdept-input-edit" name="Meeting Room 5">Meeting Room 5</li>
+                                        <li class="selectdept-input-edit" name="Meeting Room 6">Meeting Room 6</li>
+                                        <li class="selectdept-input-edit" name="Meeting Room 7">Meeting Room 7</li> -->
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                        <div class="input-step-2">
+                             
+                            <div class="title-meet box-input">
+                                <p class="title">หัวข้อการประชุม</p>
+                                <div>
+                                    <input type="text" name="title-edit"  id="title-edit" placeholder="กรอกข้อมูล . . .">
+                                </div>
+                                <span class="alert-input title-edit">กรุณาระบุหัวข้อการประชุม</span>
+        
+                            </div>
+                            <div class="detail box-input">
+                                <p class="title">รายละเอียดการประชุม</p>
+                                <div>
+                                    <textarea name="detail-edit" id="detail-edit" rows="3" cols="65" placeholder=" . . ."></textarea>
+                                </div>
+                            </div>
+                            <div class="detail box-input">
+                                <p class="title">วันที่</p>
+                                <div>
+                                    <input type="date" name="date-edit" id="date-edit" placeholder="วัน/เดือน/ปี">
+                                </div>
+                                <span class="alert-input date-edit">กรุณาระบุวันที่</span>
+
+                            </div>
+                            <div class="timeleng box-input">
+                              
+                                <p class="title">ระยะเวลา</p>
+                                <div class="leng">
+                                    <div class="startdate"><i class=""></i>
+                                        <div>
+                                            <label>เริ่มประชุม</label><input type="time"  name="startdate-edit" id="startdate-edit">
+                                        </div>
+                                    </div> 
+                                    <div class="enddate"><i class=""></i> 
+                                        <div>
+                                            <label>สิ้นสุด</label><input type="time"  name="enddate-edit" id="enddate-edit">
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="alert-input startdate-edit">กรุณาระบุระยะเวลาการประชุม</span>
+
+                                
+                                <!-- <div class="allday"></div> -->
+                            </div>
+                             
+                            <div class="accessories edit box-input">
+                                <p class="title">รายการอุปกรณ์เสริม</p>
+                                <div>
+                                    {{-- <nav>
+                                        <input type="checkbox" id="item1-edit" name="item1-edit" value="Bike">
+                                        <label for="item1-edit">item 1</label><br>
+                                    </nav>
+                                    <nav>
+                                        <input type="checkbox" id="item2-edit" name="item2-edit" value="Car">
+                                        <label for="item2-edit">item 2</label><br>
+                                    </nav>
+                                    <nav>
+                                        <input type="checkbox" id="item3-edit" name="item3-edit" value="Boat">
+                                        <label for="item3-edit">item 3</label><br><br>
+                                    </nav> --}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="footer">
+                        <div class="box-button">
+                             <input type="submit" value="submit">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="event-tool">
+                <div class="room"><label>&nbsp;&nbsp;&nbsp;</label></div>
+                <div class="datetime"><label>&nbsp;&nbsp;&nbsp;</label>&nbsp;&nbsp;&nbsp;<label>&nbsp;&nbsp;&nbsp;</label></div>
+                <div class="planner"><label>&nbsp;&nbsp;&nbsp;</label></div>
+                <div class="dept"><label>&nbsp;&nbsp;&nbsp;</label></div>
+                <div class="content-btn">
+                    {{-- <input type="button" class="event-edit" value="ปรับเปลี่ยน"> </input>
+                    <input type="button" class="event-cancel" value="ยกเลิก"> </input> --}}
+                </div>
+            </div>
+            <div class="event-tool-after"></div>
+
+            <div class="backdrop-alert">
+             
+            </div>
+
+        </div>
+    </div>
+    <script>
+
+        // $.ajaxSetup({
+        //     headers: {
+        //         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        //     }
+        // });
+        
+        let dataJson = [];
+        let roomCurrent = {roomid: "", index: 0}
+
+        let pageActive = {
+            "pageCalendar" : true,
+            "pageHeatMap" : false
+        }
+
+        let dataEvents = [
+            // {
+            //     "planid" : "pl-v54w-152023-0001",
+            //     "appointid" : "apoint-152023-0001",
+            //     "mrid" : "meetingroom-1",
+            //     "deptid" : "engineer",
+            //     "planner" : "suwanee",
+            //     "adate" : "2023-06-15 10:00:00",
+            //     "startdate" : "2023-06-11 11:00:00",
+            //     "enddate" : "2023-06-11 17:00:00"
+            // },
+            // {
+            //     "planid" : "pl-th5j-152023-0002",
+            //     "appointid" : "apoint-152023-0001",
+            //     "mrid" : "meetingroom-1",
+            //     "deptid" : "purchase",
+            //     "planner" : "kanda",
+            //     "adate" : "2023-06-26 8:24:45",
+            //     "startdate" : "2023-06-27 10:00:00",
+            //     "enddate" : "2023-06-27 17:00:00"
+            // }
+        ];
+
+        const formatDatetime = (date,time) => {
+            let dateFormat = new Date(date);
+
+            if(time != "") {
+                dateFormat.setHours(time.split(':')[0]);
+                dateFormat.setMinutes(time.split(':')[1]);
+                dateFormat.setSeconds(0);
+            }
+         
+            return  String(dateFormat.getFullYear()).padStart(2, '0')+
+                        "-"+ String((dateFormat.getMonth()+1)).padStart(2, '0')+
+                        "-"+ String(dateFormat.getDate()).padStart(2, '0')+
+                        " "+ String(dateFormat.getHours()).padStart(2, '0')+
+                        ":"+ String(dateFormat.getMinutes()).padStart(2, '0')+
+                        ":"+ String(dateFormat.getSeconds()).padStart(2, '0');
+        }
+        
+
+        const dateRangeOverlaps = (a_start, a_end, b_start, b_end) =>  {
+            if (a_start <= b_start && b_start < a_end) return true; 
+            if (a_start < b_end   && b_end  < a_end) return true; 
+            if (b_start <  a_start && a_end  <  b_end) return true; 
+            return false;
+        }
+
+        const str00 = (num, strV) => {
+            return String(num).padStart(strV, '0')
+        }
+
+        // function readJson(file, callback) {
+        //     var rawFile = new XMLHttpRequest();
+        //     rawFile.overrideMimeType("application/json");
+        //     rawFile.open("GET", file, true);
+        //     rawFile.onreadystatechange = function() {
+        //         if (rawFile.readyState === 4 && rawFile.status == "200") {
+        //             callback(rawFile.responseText);
+        //         }
+        //     }
+        //     rawFile.send(null);
+        // }
+         
+        const recheck = () => {
+            let deptRadio = document.querySelectorAll(".btn-nav-dept");
+
+            deptRadio.forEach((radio) => {
+                document.querySelector(".radio-dept-" + radio.id).classList.remove("disable");
+                document.querySelector(".radio-dept-" + radio.id).style.backgroundColor = radio.getAttribute("name")
+            });
+
+            document.querySelector(".btn-all-dept").classList.add('active')
+
+        }
+
+        const togglecheckAll = () => {
+            let deptRadio = document.querySelectorAll(".btn-nav-dept");
+
+            if(document.querySelector(".btn-all-dept").classList.contains('active')) {
+                deptRadio.forEach((radio) => {
+                    document.querySelector(".radio-dept-" + radio.id).classList.add("disable");
+                    document.querySelector(".radio-dept-" + radio.id).style.backgroundColor = "#dbdbdb"
+
+                    if(pageActive.pageCalendar) {
+                        document.querySelectorAll(".event-day." + radio.id).forEach((eventdept) => {
+                            eventdept.style.display = "none";
+                        })
+                    }
+
+                    if(pageActive.pageHeatMap) {
+                        setTimeout(function() {
+                            document.querySelector(".content-heatmap."+ radio.id).classList.add('displayNone')
+                        }, 400)
+                        document.querySelector(".content-heatmap."+ radio.id).classList.add('active')
+                    }
+                    
+                });
+
+            } else {
+                deptRadio.forEach((radio) => {
+                    document.querySelector(".radio-dept-" + radio.id).classList.remove("disable");
+                    document.querySelector(".radio-dept-" + radio.id).style.backgroundColor = radio.getAttribute("name")
+
+                    if(pageActive.pageCalendar) {
+                        document.querySelectorAll(".event-day." + radio.id).forEach((eventdept) => {
+                            eventdept.style.display = "block";
+                        })
+                    }
+
+                    if(pageActive.pageHeatMap) {
+                        document.querySelector(".content-heatmap."+ radio.id).classList.remove('displayNone')
+                        setTimeout(function() {
+                            document.querySelector(".content-heatmap."+ radio.id).classList.remove('active')
+                        }, 400)
+                    }
+                });
+            }
+
+            document.querySelector(".btn-all-dept").classList.toggle('active')
+        }
+
+        const roomDropdownMenu = () => {
+            document.querySelector(".room-dropdown").classList.toggle('active')
+ 
+        }
+
+        const selectRoomDropdownMenu = () => {
+            // document.querySelector(".selectroom-dropdown").classList.toggle('active')
+            
+        }
+
+        const selectDeptDropdownMenu = () => {
+            document.querySelector(".selectdept-dropdown").classList.toggle('active')
+        }
+
+
+        const selectRoomDropdownMenuEdit = () => {
+            document.querySelector(".selectroom-dropdown-edit").classList.toggle('active')
+            
+        }
+
+        const selectDeptDropdownMenuEdit = () => {
+            document.querySelector(".selectdept-dropdown-edit").classList.toggle('active')
+        }
+
+        const addListenerNav = () => {
+
+            const deptRadio = document.querySelectorAll(".btn-nav-dept");
+ 
+            let ebuff
+
+            deptRadio.forEach((dept) => {
+                dept.addEventListener("click", (e) => {
+                    ebuff = document.querySelector(".radio-dept-" + e.target.id);
+
+                    if(ebuff.classList.contains('disable')) {                 
+
+                        ebuff.style.backgroundColor = e.target.getAttribute("name")
+
+                        if(pageActive.pageCalendar) {
+                            document.querySelectorAll(".event-day." + e.target.id).forEach((eventdept) => {
+                                eventdept.style.display = "block";
+                             })
+                        }
+
+                        if(pageActive.pageHeatMap) {
+                            document.querySelector(".content-heatmap."+ e.target.id).classList.remove('displayNone')
+                            setTimeout(function() {
+                                document.querySelector(".content-heatmap."+ e.target.id).classList.remove('active')
+                            }, 400)
+                        }
+                   
+
+                    } else {                    
+
+                        ebuff.style.backgroundColor = "#dbdbdb"
+
+                        if(pageActive.pageCalendar) {
+                            document.querySelectorAll(".event-day." + e.target.id).forEach((eventdept) => {
+                                eventdept.style.display = "none";
+                            })
+                        }
+
+                        if(pageActive.pageHeatMap) {
+                            setTimeout(function() {
+                                document.querySelector(".content-heatmap."+ e.target.id).classList.add('displayNone')
+                            }, 400)
+                            document.querySelector(".content-heatmap."+ e.target.id).classList.add('active')
+                        }
+                       
+
+                    }
+
+                    
+                    ebuff.classList.toggle('disable');
+ 
+
+                })
+            })
+        }
+
+        const renderDropdownMeetingRooms = (content_class, content_class_add) => {
+            // let content = "";
+            roomCurrent.roomid = dataJson.meetingRoom[0].mrid
+            // renderSelectAccessories(roomCurrent.roomid)
+
+            document.getElementById("selectroom-input-label").innerHTML = dataJson.meetingRoom[0].mrname
+            document.getElementById("selectroom-input").value = dataJson.meetingRoom[0].mrid
+
+            if(dataJson != []) {
+                dataJson.meetingRoom.forEach((e, index) => {  
+                    if(e.isopen) {
+                        // content +=  "<li class='"+ content_class +"' name='"+ e.mrname +"' id='"+ e.mrid +"' key='"+ index +"' >"+ e.mrname +"</li>" 
+                        // console.log(content);
+
+                        let li = document.createElement("li");
+                        li.classList.add(content_class);
+                        li.innerHTML = e.mrname;
+                        li.setAttribute("name",  e.mrname);
+                        li.setAttribute("id",  e.mrid);
+                        li.setAttribute("key",  index);
+                        li.addEventListener('click', () => { 
+
+                            document.getElementById(content_class+'-label').innerHTML = e.mrname
+                            document.getElementById(content_class).value =  e.mrid
+
+                            if(content_class == 'room-input') {
+                                renderEventsPlanningReset(roomCurrent.roomid)
+                                renderEventsPlanning(e.mrid)
+
+                                roomCurrent.roomid =  e.mrid
+                                roomCurrent.index =  index
+                                // console.log( roomCurrent.roomid )
+
+                                renderSelectAccessories(e.mrid)
+
+                                document.getElementById("selectroom-input-label").innerHTML = e.mrname
+                                document.getElementById("selectroom-input").value = e.mrid
+                                
+                            } else if(content_class == 'selectroom-input-edit') {
+
+                                document.getElementById(content_class+'-label').innerHTML = e.mrname
+                                document.getElementById(content_class).value =  e.mrid
+
+                                renderSelectAccessoriesEdit(e.mrid, 'null');
+                                
+                            }
+                            
+                        });
+
+                        document.querySelector("." + content_class_add +" ul").appendChild(li)
+                        
+                    }      
+                    
+                });
+
+                // document.querySelector("." + content_class_add +" ul").innerHTML = content
+             
+            }
+        }
+
+        const renderDropdownDepts = (content_class, content_class_add) => {
+            // let content = "";
+
+            if(dataJson != []) {
+                dataJson.Dept.forEach((e, index) => {  
+                    if(e.active) {
+                        // content +=  "<li style='--color-dept:"+ e.color +"' class='"+ content_class +"' name='"+ e.name +"' id='"+ e.id +"' key='"+ index +"'>"+ e.name +"</li>" 
+ 
+                        let li = document.createElement("li");
+                        li.classList.add(content_class);
+                        li.style = '--color-dept: '+ e.color ;
+                        li.innerHTML = e.name;
+                        li.setAttribute("name",  e.name);
+                        li.setAttribute("id",  e.id);
+                        li.setAttribute("key",  index);
+                        li.addEventListener('click', () => { 
+                            document.getElementById(content_class+'-label').innerHTML = e.name
+                            document.getElementById(content_class).value =  e.id
+                        
+                        });
+
+                        document.querySelector("." + content_class_add +" ul").appendChild(li)
+                        
+                     }      
+                    
+                });
+
+                // document.querySelector("." + content_class_add +" ul").innerHTML = content
+            
+            }
+        }
+
+
+        const renderSelectAccessories = (mrid) => {
+            let content = "";
+            // let room_acc = [];
+            let acc = [];
+ 
+            $.ajax({
+ 
+                url: '/meetingplanner/show/?id=' + mrid + '&content=' + "room_acc" ,
+                type: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(room_acc) {
+                    if(room_acc.length != 0 ) {
+                         room_acc.forEach((e, index) => {  
+
+                            acc = (dataJson.accessories[dataJson.accessories.findIndex(obj => { return obj.accid == e.accid })])
+
+                            if(acc.stock != 0) {
+                                content +=  "<nav>\
+                                                <input type='checkbox' id="+ acc.accid +" name="+ 'item-' + index +"  value='"+ acc.accid +"'>\
+                                                <label for="+ 'item-' + index +">"+ acc.accname +"</label><br>\
+                                            </nav>";
+
+                            } 
+
+                        });
+
+                        
+                    } else {
+                        content = "<nav>ไม่พบรายการอุปกรณ์</nav>"
+                    }
+
+                    document.querySelector(".accessories div").innerHTML = content
+
+                },
+                error: function(xhr, status, error) {
+                    console.log(error);
+                }
+            });
+
+
+
+            // setTimeout(() => {
+ 
+            //     if(room_acc.length != 0 ) {
+            //         // console.log(room_acc);
+            //         room_acc.forEach((e, index) => {  
+
+            //             acc = (dataJson.accessories[dataJson.accessories.findIndex(obj => { return obj.accid == e.accid })])
+
+            //             if(acc.stock != 0) {
+            //                 content +=  "<nav>\
+            //                                 <input type='checkbox' id="+ acc.accid +" name="+ 'item-' + index +"  value='"+ acc.accid +"'>\
+            //                                 <label for="+ 'item-' + index +">"+ acc.accname +"</label><br>\
+            //                             </nav>";
+
+            //             } 
+
+            //         });
+
+                    
+            //     } else {
+            //         content = "<nav>ไม่พบรายการอุปกรณ์</nav>"
+            //     }
+
+            //     document.querySelector(".accessories div").innerHTML = content
+            //     acc = []
+
+            // }, 300 );
+
+        }
+
+        const renderSelectAccessoriesEdit = (mrid, planid) => {
+            let content = "";
+            // let meeting_acc = [];
+            let acc = [];
+ 
+            $.ajax({
+ 
+                url: '/meetingplanner/show/?id=' + mrid + '&id2=' +  planid + '&content=' + "meeting_acc" ,
+                type: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(meeting_acc) {
+
+                    if(  meeting_acc != [] && meeting_acc.roomacc.length != 0 ) {
+
+                        meeting_acc.roomacc.forEach((e, index) => {  
+ 
+                            acc = (dataJson.accessories[dataJson.accessories.findIndex(obj => { return obj.accid == e.accid })])
+
+                            if(acc.stock != 0) {
+                                content +=  "<nav>\
+                                                <input type='checkbox' id="+ acc.accid +" name="+ 'item-' + index +"  value='"+ acc.accid + "' " + ( meeting_acc.meetingacc.length > 0 && (meeting_acc.meetingacc.findIndex( obj => { return obj.accid == e.accid }) != -1) ? 'checked' : '' ) + ">\
+                                                <label for="+ 'item-' + index +">"+ acc.accname +"</label><br>\
+                                            </nav>";
+
+                            } 
+
+                        });
+
+
+                    } else {
+                        content = "<nav>ไม่พบรายการอุปกรณ์</nav>"
+                    }
+
+                    document.querySelector(".accessories.edit div").innerHTML = content
+
+                },
+                error: function(xhr, status, error) {
+                    console.log(error);
+                }
+            });
+
+            // setTimeout(() => {
+
+            //     if(  meeting_acc != [] && meeting_acc.roomacc.length != 0 ) {
+
+            //         meeting_acc.roomacc.forEach((e, index) => {  
+            //             // console.log();
+
+            //             acc = (dataJson.accessories[dataJson.accessories.findIndex(obj => { return obj.accid == e.accid })])
+
+            //             if(acc.stock != 0) {
+            //                 content +=  "<nav>\
+            //                                 <input type='checkbox' id="+ acc.accid +" name="+ 'item-' + index +"  value='"+ acc.accid + "' " + ( meeting_acc.meetingacc.length > 0 && (meeting_acc.meetingacc.findIndex( obj => { return obj.accid == e.accid }) != -1) ? 'checked' : '' ) + ">\
+            //                                 <label for="+ 'item-' + index +">"+ acc.accname +"</label><br>\
+            //                             </nav>";
+
+            //             } 
+
+            //         });
+
+                    
+            //     } else {
+            //         content = "<nav>ไม่พบรายการอุปกรณ์</nav>"
+            //     }
+
+            //     document.querySelector(".accessories.edit div").innerHTML = content
+            //     acc = []
+
+            // }, 500 );
+
+        }
+
+        const renderNavbar = ( ) => {
+            let content = "";
+
+            var rootStyle = document.querySelector(':root');
+            // let styleDeptColor = "";
+
+            if(dataJson != []) {
+                dataJson.Dept.forEach((e, index) => {
+
+                    // styleDeptColor += "--color-" + e.id + ":" + e.color + ";"
+                    rootStyle.style.setProperty("--color-" + e.id, e.color);
+                    rootStyle.style.setProperty("--color-map-" + e.id, e.rgb);
+
+                    if(e.active) {
+                        content += "<div id=" + e.id + " name="+ e.color +" class='btn-nav-dept'>\
+                                    <div id=" + e.id + "  name="+ e.color +" class='btn-nav-dept-icon'>\
+                                        <i id=" + e.id + "  name="+ e.color +" style='background-color: " + e.color + ";' class='dept-radio radio-dept-" + e.id + "'></i>\
+                                    </div>\
+                                    <div id=" + e.id + " name="+ e.color +" class='btn-nav-dept-name'>" + e.name + "</div>\
+                                </div>" 
+                    }      
+                    
+                });
+
+                document.querySelector(".nav-content").innerHTML = content
+                addListenerNav()
+            }
+        }
+
+        // readJson("../test/dept-data-render.json", function(obj){
+        //     dataJson = JSON.parse(obj);
+        //     renderNavbar()
+        //     renderDropdownMeetingRooms('room-input', 'room-dropdown')
+
+        //     renderDropdownMeetingRooms('selectroom-input', 'selectroom-dropdown')
+        //     renderDropdownDepts('selectdept-input', 'selectdept-dropdown')
+
+        //     renderDropdownMeetingRooms('selectroom-input-edit', 'selectroom-dropdown-edit')
+        //     renderDropdownDepts('selectdept-input-edit', 'selectdept-dropdown-edit')
+
+        // });
+
+        const callData = ( ) => {
+            //dataJson.meetingRoom
+            //dataJson.Dept[
+            // dataJson = JSON.parse({!! json_encode($data['json']) !!});
+            dataSchedules = ({!! json_encode($data['schedules']) !!});
+            dataJson.meetingRoom = ({!! json_encode($data['meetingroom']) !!});
+            dataJson.Dept = ({!! json_encode($data['dept']) !!});
+            dataJson.accessories = ({!! json_encode($data['accessories']) !!});
+
+            // console.log(dataJson)
+            // console.log(dataSchedules)
+            dataEvents = dataSchedules
+            //console.log(dataEvents)
+
+            renderNavbar()
+            renderDropdownMeetingRooms('room-input', 'room-dropdown')
+
+            renderDropdownMeetingRooms('selectroom-input', 'selectroom-dropdown')
+            renderDropdownDepts('selectdept-input', 'selectdept-dropdown')
+
+            renderDropdownMeetingRooms('selectroom-input-edit', 'selectroom-dropdown-edit')
+            renderDropdownDepts('selectdept-input-edit', 'selectdept-dropdown-edit')
+
+        }
+
+        callData()
+
+        const resetPageCalendar = () => {
+            roomCurrent.roomid = dataJson.meetingRoom[0].mrid
+            renderSelectAccessories(roomCurrent.roomid)
+
+            roomCurrent.index = 0
+            document.getElementById("room-input-label").innerHTML = dataJson.meetingRoom[0].mrname
+            document.getElementById("selectroom-input-label").innerHTML = dataJson.meetingRoom[0].mrname
+            document.getElementById("selectroom-input").value = dataJson.meetingRoom[0].mrid
+
+        }
+
+        function convertTime(time) {
+            let timeArr = time.split(":");
+            let timeHour = timeArr[0];
+            let timeMin = timeArr[1];
+            let timeFormat = timeHour >= 12 ? "PM" : "AM";
+            timeHour = timeHour % 12 || 12;
+            time = timeHour + ":" + timeMin + " " + timeFormat;
+            return time;
+        }
+
+        const renderEventTool = (e) => { 
+            
+            document.querySelector('.event-tool .room label').innerHTML = e.room
+            document.querySelector('.event-tool .datetime').innerHTML = "<label>" + e.date + "</label>&nbsp;&nbsp;&nbsp;<label>" + e.time + "</label></div>"
+            document.querySelector('.event-tool .planner label').innerHTML =  "By " + e.planner
+            document.querySelector('.event-tool .dept label').innerHTML = e.dept
+  
+            if (new Date(e.fulldateEnd) > new Date() ) {
+                let input_edit = document.createElement("input");
+                input_edit.classList.add('event-edit')
+                input_edit.setAttribute("type", "button");
+                input_edit.setAttribute("value", "ปรับเปลี่ยน");
+                input_edit.addEventListener('click', () => { 
+                    activeDialogEdit(e);
+                });
+
+                let input_cancel = document.createElement("input");
+                input_cancel.classList.add('event-cancel')
+                input_cancel.setAttribute("type", "button");
+                input_cancel.setAttribute("value", "ยกเลิก");
+                input_cancel.addEventListener('click', () => { 
+                    actionConfirm({ id: e.planid, message: 'ยกเลิกการประชุม : ', objDetail: e.room + ' &nbsp;&nbsp;' + e.date + ' &nbsp;&nbsp;' + e.time , callFunc: 'funcEventCancel' });
+                });
+
+                document.querySelector('.content-btn').appendChild(input_edit)
+                document.querySelector('.content-btn').appendChild(input_cancel)
+            }
+
+            
+
+            // let inputElementEventEdit = document.querySelector('.event-tool .content-btn .event-edit')
+            // inputElementEventEdit.type = "button"; inputElementEventEdit.classList = "event-edit"; inputElementEventEdit.value = "ปรับเปลี่ยน";
+            // inputElementEventEdit.addEventListener('click', () => { 
+            //     activeDialogEdit(e) 
+            //  });
+
+  
+            // let inputElementEventCancel = document.querySelector('.event-tool .content-btn .event-cancel');
+            // inputElementEventCancel.type = "button"; inputElementEventCancel.classList = "event-cancel"; inputElementEventCancel.value = "ยกเลิก";
+            // inputElementEventCancel.addEventListener('click', () => { 
+            //     actionConfirm({ id: e.planid, message: 'ยกเลิกการประชุม : ', objDetail: e.room + ' &nbsp;&nbsp;' + e.date + ' &nbsp;&nbsp;' + e.time , callFunc: 'funcEventCancel' });
+            // });
+            
+ 
+             //{ id: '', message: 'ยกเลิกการประชุม : ', objDetail: '', callFunc: '' }
+        }
+
+        const renderEventEdit = (e) => { 
+            // console.log(e)
+            let dataThisEvent = dataEvents[dataEvents.findIndex(obj => { return obj.planid === e.planid })]
+            // console.log(dataThisEvent);
+
+            document.getElementById("planid").value = dataThisEvent.planid
+            // document.getElementById("appointid").value = dataThisEvent.appointid
+            document.getElementById("planner-edit").value = dataThisEvent.planner
+
+            document.getElementById("selectroom-input-edit-label").innerHTML = e.room
+            document.getElementById("selectroom-input-edit").value = dataThisEvent.mrid
+
+            document.getElementById("selectdept-input-edit-label").innerHTML = e.dept
+            document.getElementById("selectdept-input-edit").value = dataThisEvent.deptid
+
+            document.getElementById("title-edit").value =  dataThisEvent.title
+            document.getElementById("detail-edit").value =  dataThisEvent.detail
+            document.getElementById("date-edit").value = dataThisEvent.startdate.split(' ')[0]
+            document.getElementById("startdate-edit").value = dataThisEvent.startdate.split(' ')[1].slice(0,5)
+            document.getElementById("enddate-edit").value = dataThisEvent.enddate.split(' ')[1].slice(0,5)
+
+            renderSelectAccessoriesEdit(roomCurrent.roomid, dataThisEvent.planid)
+        }
+
+        const printMousePos = (event) => {
+            //
+            // console.log(event.clientY)
+            document.querySelector(".event-tool").style.display = "flex"
+            document.querySelector(".event-tool-after").style.display = "flex"
+
+            document.querySelector(".event-tool").style.top =  ( event.clientY > 530? (event.clientY - 170) : (event.clientY + 36) ) + "px"
+            document.querySelector(".event-tool").style.left = ( event.clientX < 750? (event.clientX - 30) : (event.clientX - 190) ) + "px"
+
+            document.querySelector(".event-tool-after").style.top =  ( event.clientY > 530? (event.clientY - 29) : (event.clientY + 29) ) + "px" 
+            document.querySelector(".event-tool-after").style.left = event.clientX + "px"
+
+            event.clientY > 530 ? document.querySelector(".event-tool-after").style.transform = "rotate(3.142rad)" : document.querySelector(".event-tool-after").style.transform = "rotate(0)"
+
+            // setTimeout(() => {
+            //     document.querySelector(".event-tool").style.display = "none"
+            //     document.querySelector(".event-tool-after").style.display = "none"
+            // }, 5000 );
+        }
+
+        const addListenerEvens = () => {
+
+            const events = document.querySelectorAll(".event-day");
+
+            let ebuff
+
+            events.forEach((event) => {
+                event.addEventListener("click", (e) => {
+
+                    if( document.querySelector('.event-tool .content-btn .event-edit')) {
+                        document.querySelector('.event-tool .content-btn .event-edit').remove();
+                        document.querySelector('.event-tool .content-btn .event-cancel').remove();
+
+                    }
+                   
+                    printMousePos(e)
+
+                    let dataTool1 = e.target.id.split('//')
+                    let dataTool2 = e.target.classList.value.split(' ')
+
+                    renderEventTool(
+                        {
+                            planid: dataTool2[3],
+                            room: dataJson.meetingRoom[dataJson.meetingRoom.findIndex(obj => { return obj.mrid === dataTool2[2] })].mrname,
+                            date: new Date(dataTool1[1]).getDate() + '/' + String(new Date(dataTool1[1]).getMonth()+1).padStart(2, '0') + '/' + new Date(dataTool1[1]).getFullYear(),
+                            time: convertTime(dataTool1[1].split(' ')[4]) + ' - ' + convertTime(dataTool1[2].split(' ')[4]),
+                            planner: dataTool1[3],
+                            dept: dataJson.Dept[dataJson.Dept.findIndex(obj => { return obj.id === dataTool2[1] })].name,
+                            fulldateEnd:  new Date(dataTool1[2])
+                        }
+                    )
+                });
+            })
+        }
+
+        const renderEventsPlanning = (roomId) => {
+
+            document.querySelector('.room-status').classList.remove('active')
+
+            try {
+                document.querySelectorAll(".event-day." + roomCurrent.roomid).forEach((eventdept) => {
+                    eventdept.remove();
+
+                })
+    
+            } catch (error) {
+                console.log(error);
+            }
+                                                
+            if(dataEvents) {
+                dataEvents.forEach((e, index) => {  
+                    if(e.mrid == roomId) {
+
+                        if( dateRangeOverlaps(new Date(e.startdate), new Date(e.enddate), new Date(), new Date()) ) {
+                            document.querySelector('.room-status').classList.add('active')
+
+                        }
+                            
+
+                        if(document.getElementById(new Date(e.startdate.split(' ')[0] + ' 00:00:00'))) {
+                         
+                            let spanEvent = document.createElement('span')
+                            spanEvent.classList = 'event-day ' + e.deptid + ' ' + e.mrid + ' ' + e.planid + ( new Date(e.enddate) < new Date( )? ' event-end' : '' )
+                            spanEvent.style = "--eventSize: 1;--color-event:var(--color-"+ e.deptid + ");" + ( document.querySelector(".radio-dept-" + e.deptid).classList.contains('disable')? "display: none;" : "" )+ ");"
+                            spanEvent.textContent =  convertTime(e.startdate.split(' ')[1])  + " - " + convertTime(e.enddate.split(' ')[1]) + " by " + e.planner;
+                            // spanEvent.id = "event-day//" + new Date(new Date(e.startdate.split(' ')[0] + ' 00:00:00'))
+                            spanEvent.id = "event-day//" + new Date(e.startdate) + "//" + new Date(e.enddate) + "//" + e.planner
+
+                            document.getElementById(new Date(e.startdate.split(' ')[0] + ' 00:00:00')).appendChild(spanEvent) 
+
+                        }
+                    }
+                });
+
+                addListenerEvens()
+                // dept-radio radio-dept-compound disable (!(document.querySelector(".radio-dept-" + e.deptid).classList.contains('disable'))?
+            }
+ 
+        }
+
+        const renderEventsPlanningReset = () => {
+            document.querySelectorAll(".event-day." + roomCurrent.roomid).forEach((eventdept) => {
+                eventdept.remove();
+
+            })
+        }
+
+
+        const actionEventCancel = (e) => {
+            // let newITtimefilter = UserIt.filter((it) => (ITtimefilter.findIndex(object => { return it.id === object.assign } ) === -1) && it.id !== userInfo.id)
+
+            if(e) {
+                // dataEvents.splice(dataEvents.findIndex(obj => { return obj.planid == e.id }, 1 ));
+                
+                dataEvents = dataEvents.filter((event) => ( event.planid != e.id) )
+                $.ajax({
+                            url: '/meetingplanner/'+e.id,
+                            type: 'DELETE',
+                             success: function(response) {
+                                //console.log('success')
+                            },
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            error: function(xhr, status, error) {
+                                console.log(error)
+                            }
+
+                        });
+            }
+
+            // console.log(dataEvents)
+
+            renderEventsPlanning(roomCurrent.roomid)
+        }
+
+        const actionConfirm = (e) => {
+            // console.log(e)
+            //JSON.parse(JSON.stringify(e))
+
+            document.querySelector('.event-tool .content-btn .event-edit').remove();
+            document.querySelector('.event-tool .content-btn .event-cancel').remove();
+
+            document.querySelector(".backdrop-alert").style.display = "flex"
+            document.querySelector(".backdrop-alert").innerHTML =  "<div class='alert-message'>\
+                                                                        <div class='header'><label>!</label> <i class='bx bx-x' onclick='actionConfirmClose()'></i></div>\
+                                                                        <div class='detail'>\
+                                                                            กด 'ยืนยัน' เพื่อดำเนินการ " + ( e.message? e.message : "" ) + " " + (  e.objDetail? e.objDetail : "" ) + "\
+                                                                        </div>\
+                                                                        <div class='content-btn'>\
+                                                                            <input type='button' value='ยืนยัน' class='event-confirm'> </input>\
+                                                                    </div>"
+
+            var inputElementEventConfirm = document.querySelector(".backdrop-alert .content-btn .event-confirm");
+            inputElementEventConfirm.addEventListener('click', () => {
+                if(e.callFunc &&  e.callFunc == "funcEventCancel") {
+                    actionEventCancel({id: e.id? e.id : ""})
+                }
+
+                actionConfirmClose()
+            });     
+            
+                                                        
+        }
+
+        const actionConfirmClose = () => {
+            document.querySelector(".backdrop-alert").style.display = "none"
+
+        }
+        
+        const nextRoom = () => {
+            
+            // document.querySelectorAll(".event-day." + roomCurrent.roomid).forEach((eventdept) => {
+            //     eventdept.remove();
+
+            // })
+            renderEventsPlanningReset(roomCurrent.roomid)
+
+            if(roomCurrent.index + 1 < dataJson.meetingRoom.length) { 
+
+                roomCurrent.roomid =  dataJson.meetingRoom[roomCurrent.index + 1].mrid
+                renderSelectAccessories(roomCurrent.roomid)
+
+                document.getElementById("room-input-label").innerHTML = dataJson.meetingRoom[roomCurrent.index + 1].mrname
+                document.getElementById("selectroom-input-label").innerHTML = dataJson.meetingRoom[roomCurrent.index + 1].mrname
+                document.getElementById("selectroom-input").value = dataJson.meetingRoom[roomCurrent.index + 1].mrid
+
+                roomCurrent.index ++
+
+                renderEventsPlanning(roomCurrent.roomid)
+            }
+        }
+
+        const prevRoom = () => {
+           
+            if(roomCurrent.index - 1 >= 0) {
+
+                // document.querySelectorAll(".event-day." + roomCurrent.roomid).forEach((eventdept) => {
+                //     eventdept.remove();
+
+                // })
+                renderEventsPlanningReset(roomCurrent.roomid)
+
+
+                roomCurrent.roomid =  dataJson.meetingRoom[roomCurrent.index - 1].mrid
+                renderSelectAccessories(roomCurrent.roomid)
+
+                document.getElementById("room-input-label").innerHTML = dataJson.meetingRoom[roomCurrent.index - 1].mrname
+                document.getElementById("selectroom-input-label").innerHTML = dataJson.meetingRoom[roomCurrent.index - 1].mrname
+                document.getElementById("selectroom-input").value = dataJson.meetingRoom[roomCurrent.index - 1].mrid
+
+                roomCurrent.index --
+
+                renderEventsPlanning(roomCurrent.roomid)
+            }
+        }
+
+        const renderPageCalendar = ( ) => {
+
+            pageActive = {
+                "pageCalendar" : true,
+                "pageHeatMap" : false
+            }
+
+            document.querySelector(".meeting-room").classList.add('active') 
+            setTimeout(function() {
+                document.querySelector(".room-dropdown").classList.add('enable')
+            }, 400)
+
+            recheck();
+
+            document.querySelector(".content").innerHTML = ""
+            document.querySelector(".content").innerHTML = "<div class='container-calendar'>\
+                                                                <div class='calendar'>\
+                                                                    <div class='head-calendar'>\
+                                                                        <div class='nav-left'>\
+                                                                            <button class='today-btn-a'>Today</button>\
+                                                                            <i class='bx bx-chevron-left prev'></i>\
+                                                                            <i class='bx bx-chevron-right next'></i>\
+                                                                            <div class='date'>december 2015</div>\
+                                                                        </div>\
+                                                                    </div>\
+                                                                    <div class='weekdays'>\
+                                                                        <div>Sun</div>\
+                                                                        <div>Mon</div>\
+                                                                        <div>Tue</div>\
+                                                                        <div>Wed</div>\
+                                                                        <div>Thu</div>\
+                                                                        <div>Fri</div>\
+                                                                        <div>Sat</div>\
+                                                                    </div>\
+                                                                    <div class='days'> </div>\
+                                                                    <div class='events'> </div>\
+                                                                </div>\
+                                                            </div>";
+                                                            
+
+            const calendar = document.querySelector(".calendar"),
+            date = document.querySelector(".date"),
+            daysContainer = document.querySelector(".days"),
+            prev = document.querySelector(".prev"),
+            next = document.querySelector(".next"),
+            todayBtn = document.querySelector(".today-btn-a");
+
+            let today = new Date();
+            let activeDay;
+            let month = today.getMonth();
+            let year = today.getFullYear();
+
+            const months = [
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December",
+            ];
+
+            let selecting, start, end;
+
+            function initCalendar() {
+                const firstDay = new Date(year, month, 1);
+                const lastDay = new Date(year, month + 1, 0);
+                const prevLastDay = new Date(year, month, 0);
+                const prevDays = prevLastDay.getDate();
+                const lastDate = lastDay.getDate();
+                const day = firstDay.getDay();
+                const nextDays = 7 - lastDay.getDay() - 1;
+
+                daysContainer.innerHTML = "";
+                selecting = false;
+                
+
+                date.innerHTML = months[month] + " " + year;
+    
+                let element_day;
+
+                for (let x = day; x > 0; x--) {
+                    element_day = document.createElement('div');
+                    element_day.classList += "day prev-date ";
+                    element_day.textContent = prevDays - x + 1;
+                
+                    daysContainer.appendChild(element_day);
+                }
+
+                for (let i = 1; i <= lastDate; i++) {
+                    element_day = document.createElement('div');
+
+                    if (
+                        i === new Date().getDate() &&
+                        year === new Date().getFullYear() &&
+                        month === new Date().getMonth()
+                    ) {
+                        activeDay = i;
+
+
+                        element_day.classList += "day today active ";
+                        element_day.textContent = i;
+                        element_day.name = i + day; 
+                        element_day.id = new Date(year, month, i)
+
+                        daysContainer.appendChild(element_day);
+
+                    } else {
+                 
+                        element_day.classList += "day " + ( new Date(year, month, i) < new Date()? ' old' : '' );
+                        element_day.textContent = i;
+                        element_day.name = i + day;
+                        element_day.id = new Date(year, month, i)
+
+                        daysContainer.appendChild(element_day);
+  
+                    }
+                }
+
+                for (let j = 1; j <= nextDays; j++) {
+                    element_day = document.createElement('div');
+                    element_day.classList += "day next-date ";
+                    element_day.textContent = j;
+                    element_day.id = new Date(year, month, j)
+                
+                    daysContainer.appendChild(element_day)
+                }
+
+                addListner();
+                if(roomCurrent.roomid != "") {
+                    // console.log("roomCurrent.roomid : "+ roomCurrent.roomid)
+                    renderEventsPlanningReset()
+                    renderEventsPlanning(roomCurrent.roomid);
+                    // renderSelectAccessories(roomCurrent.roomid)
+
+                }
+
+            }
+
+            function prevMonth() {
+                month--;
+                if (month < 0) {
+                    month = 11;
+                    year--;
+                }
+                
+                start = undefined;
+                end = undefined;
+                initCalendar();
+            }
+
+            function nextMonth() {
+                month++;
+                if (month > 11) {
+                    month = 0;
+                    year++;
+                }
+
+                start = undefined;
+                end = undefined;
+                initCalendar();
+            }
+
+            prev.addEventListener("click", prevMonth);
+            next.addEventListener("click", nextMonth);
+
+            initCalendar();
+
+            let element_fclick;
+            let arr = document.querySelectorAll('div .day.selected');
+
+            const beginSelection = (i) => {
+                selecting = true;
+                start = i;
+
+                updateSelection(i);
+            };
+
+            const endSelection = (i = end) => {
+                updateSelection(i);
+                selecting = false;
+                arr = document.querySelectorAll('div .day.selected');                
+                document.querySelectorAll(".day").forEach((day) => {
+                             day.classList.remove("last-selected");
+                            day.classList.remove("first-selected");
+                });
+
+                if(!(arr.length <= 1)) {
+                    arr[0].classList.add('first-selected');
+                    arr[arr.length - 1].classList.add('last-selected');
+                }
+             };
+
+
+            const updateSelection = i => {
+                
+                if (selecting)
+                    end = i;
+                [...document.querySelectorAll('div .day')].forEach((div, i) => {
+                    div.classList.toggle('selected', i >= start && i <= end || i >= end && i <= start)
+                });
+
+            };
+
+            function addListner() {
+                
+                const days = document.querySelectorAll(".day");
+                selecting = false;
+                start = undefined;
+                end = undefined;
+
+                days.forEach((day) => {
+                    day.addEventListener("mousedown", (e) => {
+ 
+                        selecting = false;
+                        activeDay = Number(e.target.innerHTML);
+                        
+                        days.forEach((day) => {
+                            day.classList.remove("active");
+                            day.classList.remove("last-selected");
+                            day.classList.remove("first-selected");
+                        });
+
+                        if (e.target.classList.contains("prev-date")) {
+                            prevMonth();
+                            setTimeout(() => {
+                            const days = document.querySelectorAll(".day");
+                            days.forEach((day) => {
+                                if (
+                                    !day.classList.contains("prev-date") &&
+                                    day.innerHTML === e.target.innerHTML
+                                ) {
+                                    day.classList.add("active");
+                                }
+                            });
+                            }, 100);
+
+                        } else if (e.target.classList.contains("next-date")) {
+                            nextMonth();
+
+                            setTimeout(() => {
+                                const days = document.querySelectorAll(".day");
+                                days.forEach((day) => {
+                                    if (
+                                        !day.classList.contains("next-date") &&
+                                        day.innerHTML === e.target.innerHTML
+                                    ) {
+                                        day.classList.add("active");
+                                    }
+                                });
+
+                            }, 100);
+
+                        } else {
+                            if(e.target.classList.contains("day")) {
+                                e.target.classList.add("active");
+                                beginSelection(e.target.name - 1)
+                            }
+
+                        }
+                    });
+
+                    day.addEventListener("mousemove", (e) => {
+                        if (selecting && !( e.target.classList.contains("prev-date") || e.target.classList.contains("next-date") ) ) {
+                            updateSelection(e.target.name - 1);
+                         }                
+                    });
+
+                    day.addEventListener("mouseup", (e) => {
+                        if (selecting && !( e.target.classList.contains("prev-date") || e.target.classList.contains("next-date") ) ) {
+                            endSelection(e.target.name - 1);
+
+                            
+                            
+                            let date = e.target.getAttribute("id").split(" ")
+                            document.querySelector('.event-dialog').classList.add('active');
+                            document.querySelector('.event').name = e.target.getAttribute("id")
+
+                            if(document.querySelectorAll('div .day.selected').length == 1) {
+                                document.querySelector('.event .text-startdate').innerHTML = date[2] + " " + date[1] + " " + date[3]  
+
+                            } else {
+                                let datef = document.querySelector('.first-selected').getAttribute("id").split(" ")
+                                let datel = document.querySelector('.last-selected').getAttribute("id").split(" ")
+                                document.querySelector('.event .text-startdate').innerHTML = datef[2] + " " + datef[1] + " " + datef[3] + " &nbsp; - &nbsp; " + datel[2] + " " + datel[1] + " " + datel[3]
+                                document.getElementById('datef').value = document.querySelector('.first-selected').getAttribute("id")
+
+                            }
+
+                            document.getElementById('date').value = e.target.getAttribute("id")
+                            document.getElementById("selectroom-input").value = roomCurrent.roomid
+
+                            setTimeout(function() {
+                                document.querySelector('.event').classList.add('active');
+
+                            }, 100)
+
+                            setTimeout(function() {
+                                document.querySelector('.selectroom-dropdown').classList.add('enable');
+                                document.querySelector('.selectdept-dropdown').classList.add('enable');
+
+                            },500)
+                           
+                         }
+                        
+
+                    });
+
+                    // day.addEventListener("click", (e) => {
+                    //     let date = e.target.getAttribute("id").split(" ")
+                    //     document.querySelector('.event-dialog').classList.add('active');
+                    //     document.querySelector('.event').name = e.target.getAttribute("id") 
+                    //     document.querySelector('.event .text-startdate').innerHTML = date[2] + "/" + date[1] + "/" + date[3]
+               
+                    //     setTimeout(function() {
+                    //         document.querySelector('.event').classList.add('active');
+                    //     }, 100)
+
+                    //     setTimeout(function() {
+                    //         document.querySelector('.selectroom-dropdown').classList.add('enable');
+                    //         document.querySelector('.selectdept-dropdown').classList.add('enable');
+
+                    //     }, 1000)
+                    // })
+                    
+
+                });
+                
+            }
+
+            todayBtn.addEventListener("click", () => {
+                today = new Date();
+                month = today.getMonth();
+                year = today.getFullYear();
+                initCalendar();
+            });
+
+            // function gotoDate() {
+            //     console.log("here");
+            //     const dateArr = dateInput.value.split("/");
+            //     if (dateArr.length === 2) {
+            //         if (dateArr[0] > 0 && dateArr[0] < 13 && dateArr[1].length === 4) {
+            //         month = dateArr[0] - 1;
+            //         year = dateArr[1];
+            //         initCalendar();
+            //         return;
+            //         }
+            //     }
+            //     alert("Invalid Date");
+            // }
+
+            function convertTime(time) {
+                let timeArr = time.split(":");
+                let timeHour = timeArr[0];
+                let timeMin = timeArr[1];
+                let timeFormat = timeHour >= 12 ? "PM" : "AM";
+                timeHour = timeHour % 12 || 12;
+                time = timeHour + ":" + timeMin + " " + timeFormat;
+                return time;
+            }
+
+            setTimeout(() => {
+                resetPageCalendar()
+                renderEventsPlanningReset()
+                // console.log("roomCurrent.roomid : "+ roomCurrent.roomid)
+                renderEventsPlanning(roomCurrent.roomid);
+                // renderSelectAccessories(roomCurrent.roomid)
+
+            }, 100);
+
+            document.addEventListener('mouseup', () => endSelection());
+        };
+
+
+        ////////////////////////////////////// Page HeatMap ////////////////////////////////////////////////////
+        const renderDeptHeatMap = ( ) => {
+                let content = "";
+
+                if(dataJson != []) {
+                    dataJson.Dept.forEach((e, index) => {  
+                        if(e.active) {
+                            content += "<div class='content-heatmap "+ e.id +"' id="+ e.id +">\
+                                            <div class='title-heatmap'>"+ e.name +"</div>\
+                                            <table class='heatmap'>\
+                                                <thead>\
+                                                    <tr class='months'>\
+                                                        <td colspan='' style='width: 29px' class='box-days side-days'> </td>\
+                                                        <td colspan='5' id='jan' ><span>jan</span></td>\
+                                                        <td colspan='4' id='feb' ><span>feb</span></td>\
+                                                        <td colspan='4' id='mar' ><span>mar</span></td>\
+                                                        <td colspan='5' id='apr' ><span>apr</span></td>\
+                                                        <td colspan='4' id='may' ><span>may</span></td>\
+                                                        <td colspan='4' id='jun' ><span>jun</span></td>\
+                                                        <td colspan='5' id='jul' ><span>jul</span></td>\
+                                                        <td colspan='4' id='aug' ><span>aug</span></td>\
+                                                        <td colspan='4' id='sep' ><span>sep</span></td>\
+                                                        <td colspan='5' id='oct' ><span>oct</span></td>\
+                                                        <td colspan='4' id='nav' ><span>nav</span></td>\
+                                                        <td colspan='5' id='dec' ><span>dec</span></td>\
+                                                    </tr>\
+                                                </thead>\
+                                                <tbody>\
+                                                    <tr class='box-days sun-day "+ e.id +"' style='height: 11px'>\
+                                                        <td class='side-days'><span> </span></td>\
+                                                    </tr>\
+                                                    <tr class='box-days mon-day "+ e.id +"' style='height: 11px'>\
+                                                        <td class='side-days'><span>mon</span></td>\
+                                                    </tr>\
+                                                    <tr class='box-days tue-day "+ e.id +"' style='height: 11px'>\
+                                                        <td class='side-days'><span> </span></td>\
+                                                    </tr>\
+                                                    <tr class='box-days wed-day "+ e.id +"' style='height: 11px'>\
+                                                        <td class='side-days'><span>wed</span></td>\
+                                                    </tr>\
+                                                    <tr class='box-days thu-day "+ e.id +"' style='height: 11px'>\
+                                                        <td class='side-days'><span> </span></td>\
+                                                    </tr>\
+                                                    <tr class='box-days fri-day "+ e.id +"' style='height: 11px'>\
+                                                        <td class='side-days'><span>fri</span></td>\
+                                                    </tr>\
+                                                    <tr class='box-days sat-day "+ e.id +"' style='height: 11px'>\
+                                                        <td class='side-days'><span> </span></td>\
+                                                    </tr>\
+                                                </tbody>\
+                                            </table>\
+                                            <div class='leng-color'>\
+                                                <div class='less'>Less</div>\
+                                                <div class='color'>\
+                                                    <div class='color-box' style='background-color:  " + e.rgb.split(',')[0] + "'></div>\
+                                                    <div class='color-box' style='background-color: " + e.rgb.split(',')[1] + "'></div>\
+                                                    <div class='color-box' style='background-color: " + e.rgb.split(',')[2] + "'></div>\
+                                                    <div class='color-box' style='background-color: " + e.rgb.split(',')[3] + "'></div>\
+                                                    <div class='color-box' style='background-color: " + e.rgb.split(',')[4] + "'></div>\
+                                                </div>\
+                                                <div class='more'>More</div>\
+                                            </div>\
+                                        </div>";
+                        }      
+                        
+                    });
+                }
+               
+                document.querySelector(".box-heatmap").innerHTML = content
+        }
+    
+        const hexToRgb = (hex)  => {
+            var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        }
+
+        const calMin = (h, m) => {
+            if(m > 59) {
+                m = m - 60
+                h++
+            }
+
+            return {h: h, m: m}
+        }
+
+        const renderDataViewHeatMap = () => {
+            
+            // let dataHeatMap = [];
+
+            $.ajax({
+ 
+                url: '/meetingplanner/show/?content=' + "heatmapView" ,
+                type: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(dataHeatMap) {
+                    // dataHeatMap = response
+
+                    let bufObjMapDate;
+                    let bufObjMapX;
+                    let bufObjMapXColor;
+                    let hours;
+                    let minutes;
+                    let title;
+    
+                    if(dataHeatMap.length > 0) {
+
+                        dataHeatMap.forEach((e, index) => { 
+                            bufObjMapDate = new Date(e.startdate);
+                            bufObjMapXColor = ( getComputedStyle(document.querySelector(':root')).getPropertyValue('--color-map-'+ e.deptid) ).split(',')
+                            bufObjMapX = document.getElementById('heatmap_day//' + e.deptid + '//' + new Date(bufObjMapDate.getFullYear(), bufObjMapDate.getMonth(), bufObjMapDate.getDate(), 0, 0, 0) )
+                            hours = new Date(e.enddate).getHours() - new Date(e.startdate).getHours()
+                            minutes = new Date(e.enddate).getMinutes() - new Date(e.startdate).getMinutes()
+                            title = bufObjMapX.style.getPropertyValue('--title')
+
+                            if (bufObjMapX.style.backgroundColor != '') {
+                                hours +=  parseInt(bufObjMapX.name.split('.')[0]);
+                                minutes += parseInt(bufObjMapX.name.split('.')[1]);
+                                vHM = calMin(hours, minutes) 
+                                hours = vHM.h
+                                minutes = vHM.m
+                                bufObjMapX.style.setProperty("--title",  (title.split(' , ')[0]) + ' , ' + ( (hours == 0 ? '' : hours + 'h ') + (minutes == 0 ? '' : minutes + 'm') ) + "'");
+                                
+                            } else {
+                                bufObjMapX.style.setProperty("--title",  (title).slice(0,-1) + ' , ' + ( (hours == 0 ? '' : hours + 'h ') + (minutes == 0 ? '' : minutes + 'm') ) + "'");
+
+                            }
+
+                            if( hours >= 6 ) {
+                                bufObjMapX.style.backgroundColor = bufObjMapXColor[4]
+                               
+                            } else if( hours >= 4 ) {
+                                bufObjMapX.style.backgroundColor = bufObjMapXColor[3]
+
+                            } else if( hours >= 2 ) {
+                                bufObjMapX.style.backgroundColor = bufObjMapXColor[2]
+
+                            } else if( hours <= 1 ) {
+                                bufObjMapX.style.backgroundColor = bufObjMapXColor[1]
+
+                            }
+
+                            bufObjMapX.name = hours + '.' + minutes;
+ 
+                        })
+
+                    }
+
+                    bufObjMapDate = null;
+                    bufObjMapX = null;
+                    bufObjMapXColor = null;
+                    hours = null;
+                    minutes = null;
+                    title = null;
+                },
+                error: function(xhr, status, error) {
+                    console.log(error);
+                }
+            });
+
+            //setTimeout(() => {
+                // let bufObjMapDate;
+                // let bufObjMapX;
+                // let bufObjMapXColor;
+                // let hours;
+ 
+                // if(dataHeatMap.length > 0) {
+
+                //     dataHeatMap.forEach((e, index) => { 
+                //         bufObjMapDate = new Date(e.startdate);
+                //         bufObjMapXColor = ( getComputedStyle(document.querySelector(':root')).getPropertyValue('--color-map-'+ e.deptid) ).split(',')
+                //         bufObjMapX = document.getElementById('heatmap_day//' + e.deptid + '//' + new Date(bufObjMapDate.getFullYear(), bufObjMapDate.getMonth(), bufObjMapDate.getDate(), 0, 0, 0) )
+
+                //         hours = new Date(e.enddate).getHours() - new Date(e.startdate).getHours()
+
+                //         if( hours >= 6 ) {
+                //             bufObjMapX.style.backgroundColor = bufObjMapXColor[4]
+
+                //         } else if( hours >= 4 ) {
+                //             bufObjMapX.style.backgroundColor = bufObjMapXColor[3]
+
+                //         } else if( hours >= 2 ) {
+                //             bufObjMapX.style.backgroundColor = bufObjMapXColor[2]
+
+                //         } else if( hours <= 1 ) {
+                //             bufObjMapX.style.backgroundColor = bufObjMapXColor[1]
+
+                //         }
+
+                //     })
+
+                // }
+
+                // bufObjMapDate = null;
+                // bufObjMapX = null;
+                // bufObjMapXColor = null;
+                // hours = null;
+
+            //}, 500 );
+
+                //day count
+                // let bufObjMap;
+                // let bufObjMapX;
+                // let bufObjMapXColor;
+                // let bufObjMapXNewColor;
+
+                // if(dataHeatMap.length > 0) {
+                //     // console.log(dataHeatMap)
+                //     dataHeatMap.forEach((e, index) => {  
+                        
+                //         bufObjMap = new Date(e.startdate);
+                //         bufObjMapXColor = ( getComputedStyle(document.querySelector(':root')).getPropertyValue('--color-map-'+ e.deptid) ).split(',')
+                //         bufObjMapX = document.getElementById('heatmap_day//' + e.deptid + '//' + new Date(bufObjMap.getFullYear(), bufObjMap.getMonth(), bufObjMap.getDate(), 0, 0, 0) )
+
+                //         if(bufObjMapX.style.backgroundColor == '') {
+                //             bufObjMapX.name = 1;
+                //             bufObjMapX.style.backgroundColor =  bufObjMapXColor[1];
+                            
+                //         } else {
+                //             bufObjMapXNewColor  =  bufObjMapXColor.findIndex(color => { return 'rgb(' + hexToRgb(color).r + ', ' + hexToRgb(color).g + ', ' + hexToRgb(color).b + ')' == bufObjMapX.style.backgroundColor })
+                //             bufObjMapX.name = bufObjMapXNewColor == 4? 4 : bufObjMapXNewColor + 1;
+                //             bufObjMapX.style.backgroundColor = bufObjMapXColor[ bufObjMapXNewColor == 4? 4 : bufObjMapXNewColor + 1];
+                //         }
+ 
+                //     })
+                // }
+
+            
+
+        }
+
+        const renderPageHeatMap = ( ) => {
+
+            pageActive = {
+                "pageCalendar" : false,
+                "pageHeatMap" : true
+            }
+            
+            document.querySelector(".meeting-room").classList.remove('active')
+            document.querySelector(".room-dropdown").classList.remove('enable')
+            
+
+            recheck();
+
+            document.querySelector(".content").innerHTML = ""
+            document.querySelector(".content").innerHTML = "<div class='container-heatmap'>\
+                                                                <div class='head-heatmap'>\
+                                                                    <div class='heatmap_nav-left'>\
+                                                                        <button class='current-btn'>Current</button>\
+                                                                        <i class='bx bx-chevron-left heatmap_prev'></i>\
+                                                                        <i class='bx bx-chevron-right heatmap_next'></i>\
+                                                                        <div class='heatmap_date'>december 2015</div>\
+                                                                    </div>\
+                                                                </div>\
+                                                                <div class='box-heatmap'>\
+                                                                </div>\
+                                                            </div>";
+            renderDeptHeatMap()
+
+            const heatmap_prev = document.querySelector(".heatmap_prev"),
+            heatmap_next = document.querySelector(".heatmap_next"),
+            heatmap_date = document.querySelector(".heatmap_date"),
+            currentY = document.querySelector(".current-btn");
+
+            const weekday = ["sun","mon","tue","wed","thu","fri","sat"];
+            const monthNames = ["jan", "feb","mar", "apr", "may", "jun", "jul","aug", "sep", "oct", "nav", "dec"];
+    
+            // const tdElement_jan = document.getElementById('jan');
+            // const tdElement_feb  = document.getElementById('feb');
+            // const tdElement_mar  = document.getElementById('mar');
+            // const tdElement_apr  = document.getElementById('apr');
+            // const tdElement_may  = document.getElementById('may');
+            // const tdElement_jun  = document.getElementById('jun');
+            // const tdElement_jul  = document.getElementById('jul');
+            // const tdElement_aug  = document.getElementById('aug');
+            // const tdElement_sep  = document.getElementById('sep');
+            // const tdElement_oct  = document.getElementById('oct');
+            // const tdElement_nav  = document.getElementById('nav');
+            // const tdElement_dec  = document.getElementById('dec');
+
+            // const SunDay = document.querySelector(".sun-day");
+            // const MonDay = document.querySelector(".mon-day");
+            // const TueDay = document.querySelector(".tue-day");
+            // const WedDay = document.querySelector(".wed-day");
+            // const ThuDay = document.querySelector(".thu-day");
+            // const FriDay = document.querySelector(".fri-day");
+            // const SatDay = document.querySelector(".sat-day");
+
+            let heatmap_today = new Date();
+            let heatmap_year = heatmap_today.getFullYear();
+            let heatmap_month = 0;
+            heatmap_date.innerHTML = heatmap_year
+
+            function addElement(eId, e, day) {
+                if(day.toLowerCase() == "sun") {
+                    document.querySelector(".sun-day."+eId).appendChild(e);
+
+                } else if(day.toLowerCase() == "mon") {
+                    document.querySelector(".mon-day."+eId).appendChild(e);
+
+                } else if(day.toLowerCase() == "tue") {
+                    document.querySelector(".tue-day."+eId).appendChild(e);
+
+                } else if(day.toLowerCase() == "wed") {
+                    document.querySelector(".wed-day."+eId).appendChild(e);
+
+                } else if(day.toLowerCase() == "thu") {
+                    document.querySelector(".thu-day."+eId).appendChild(e);
+
+                } else if(day.toLowerCase() == "fri") {
+                    document.querySelector(".fri-day."+eId).appendChild(e);
+
+                } else if(day.toLowerCase() == "sat") {
+                    document.querySelector(".sat-day."+eId).appendChild(e);
+
+                }    
+            } 
+
+            function initHeatmap(eId) {
+                const heatmap_firstDay = new Date(heatmap_year, heatmap_month, 1);
+                const heatmap_lastDay = new Date(heatmap_year, heatmap_month + 1, 0);
+                const heatmap_prevLastDay = new Date(heatmap_year, heatmap_month, 0);
+                const heatmap_prevDays = heatmap_prevLastDay.getDate();
+                const heatmap_lastDate = heatmap_lastDay.getDate();
+                const heatmap_day = heatmap_firstDay.getDay();
+
+                let element_day;
+                let textday;
+
+                if(heatmap_month == 0) {
+                    for (let x = heatmap_day; x > 0; x--) {
+                        textday = weekday[ (new Date(heatmap_year, heatmap_month - 1, heatmap_prevDays - x + 1)).getDay() ] ;
+            
+                        element_day = document.createElement('td');
+                        element_day.style.width = "11px"
+                        element_day.classList += "prevDays";
+                        // element_day.textContent = prevDays - x + 1;
+
+                        addElement(eId, element_day, textday.toLowerCase())
+                    }
+                }
+
+                //heatmap //add Event
+                for (let i = 1; i <= heatmap_lastDate; i++) {
+                    textday = weekday[ (new Date(heatmap_year, heatmap_month, i)).getDay() ] ;
+
+                    element_day = document.createElement('td');
+                    element_day.classList += "heatmap_day";
+                    element_day.id = "heatmap_day//" + eId + '//' + new Date(heatmap_year,heatmap_month,i);
+                    element_day.style =  "--title: '" + ( i + "/" + monthNames[heatmap_month] + "/" + heatmap_year ).toString() + "'"; 
+                    // element_day.title = i + "/" + monthNames[heatmap_month] + "/" + heatmap_year;
+                    element_day.style.width = "11px"
+                    // element_day.textContent = i;
+
+                    // if(lastDate == i) {
+                    //     element_day.style.backgroundColor = "red"
+                    // }
+
+                    addElement(eId, element_day, textday.toLowerCase())
+                
+                }
+                
+            }
+
+            function heatRenderbox(eId) {
+                heatmap_month = 0;
+                document.querySelector(".sun-day."+eId).innerHTML = "<td class='side-days'><span> </span></td>";
+                document.querySelector(".mon-day."+eId).innerHTML = "<td class='side-days'><span>mon</span></td>";
+                document.querySelector(".tue-day."+eId).innerHTML = "<td class='side-days'><span> </span></td>";
+                document.querySelector(".wed-day."+eId).innerHTML = "<td class='side-days'><span>wed</span></td>";
+                document.querySelector(".thu-day."+eId).innerHTML = "<td class='side-days'><span> </span></td>";
+                document.querySelector(".fri-day."+eId).innerHTML = "<td class='side-days'><span>fri</span></td>";
+                document.querySelector(".sat-day."+eId).innerHTML = "<td class='side-days'><span> </span></td>";
+
+                for (let i = 1; i <= 12; i++) {
+                    initHeatmap(eId)
+                    heatmap_month++
+                }
+            }                        
+
+            const renderHeatMapOfDept = () => {
+                if(dataJson != []) {
+                    dataJson.Dept.forEach((e, index) => {
+                        if(e.active) {
+                            heatRenderbox(e.id);
+
+                        }  
+
+                    })
+                }
+
+                renderDataViewHeatMap();
+            }
+
+            renderHeatMapOfDept()
+
+            function prevYear() {
+                heatmap_year --;
+                heatmap_date.innerHTML = heatmap_year
+                renderHeatMapOfDept();
+            }
+
+            function nextYear() {
+                heatmap_year ++;
+                heatmap_date.innerHTML = heatmap_year
+                renderHeatMapOfDept();
+            }
+ 
+            function CurrentYear() {
+                heatmap_year = new Date().getFullYear();
+                heatmap_date.innerHTML = heatmap_year
+                renderHeatMapOfDept();
+            }
+
+            heatmap_next.addEventListener("click", nextYear);
+            heatmap_prev.addEventListener("click", prevYear);
+            currentY.addEventListener("click", CurrentYear);
+        };
+
+
+        const renderPageChart = ( ) => {
+            document.querySelector(".content").innerHTML = ""
+        }
+
+        //////////////////////////// main js ///////////////////////////////
+ 
+         // renderPageHeatMap()
+        renderPageCalendar()
+ 
+        const navRight = document.querySelectorAll('.nav-right i')
+
+        navRight.forEach(btn => {
+            btn.addEventListener('click', function (e) {
+
+                navRight.forEach((i) => {
+                    i.classList.remove('active')
+
+                });
+
+                e.target.classList.add('active')
+            })
+        })
+        
+        // document.querySelector('event-dialog').addEventListener("click", (e) => {
+
+        //     // document.querySelector('event-dialog').classList.remove('active');
+        // });
+
+        const inactiveDialog = () => {
+            const days = document.querySelectorAll(".day");
+
+            days.forEach((day) => {
+                day.classList.remove("active");
+                day.classList.remove("selected");
+                day.classList.remove("last-selected");
+                day.classList.remove("first-selected");
+            });
+
+            document.querySelector('.event').classList.remove('active');
+            document.getElementById("form").reset()
+            // document.getElementById('selectroom-input-label').innerHTML= "เลือกห้องประชุม"
+            document.getElementById('selectdept-input-label').innerHTML= "เลือกแผนก"
+            document.getElementById('planner').classList.remove('active')
+            document.getElementById('title').classList.remove('active')
+            document.getElementById('deptid').classList.remove('active')
+
+            setTimeout(() => {
+                document.querySelector('.event-dialog').classList.remove('active')
+                document.querySelector('.selectroom-dropdown').classList.remove('enable');
+                document.querySelector('.selectdept-dropdown').classList.remove('enable');
+
+            }, 100);
+        }
+
+        const inactiveDialogEdit = () => {
+            document.querySelector('.content-edit').classList.remove('active'); 
+
+            setTimeout(() => {
+                document.querySelector('.content-edit-dialogMove').classList.remove('active')
+                document.querySelector('.selectroom-dropdown-edit').classList.remove('enable');
+                document.querySelector('.selectdept-dropdown-edit').classList.remove('enable');
+
+            }, 100);
+        }
+
+        const activeDialogEdit = (e) => {
+            renderEventEdit(e)
+
+            document.querySelector('.event-tool .content-btn .event-edit').remove();
+            document.querySelector('.event-tool .content-btn .event-cancel').remove();
+
+            
+            document.querySelector('.content-edit-dialogMove').classList.add('active');
+            setTimeout(function() {
+                document.querySelector('.content-edit').classList.add('active');
+
+            }, 100)
+
+            setTimeout(function() {
+                document.querySelector('.selectroom-dropdown-edit').classList.add('enable');
+                document.querySelector('.selectdept-dropdown-edit').classList.add('enable');
+
+            }, 500)
+        }
+
+
+        document.querySelectorAll('div').forEach(ac => {
+            ac.addEventListener('click', function (e) { 
+                if(!(e.target.classList.contains('room') || e.target.classList.contains('room-dropdown'))) {
+                    document.querySelector(".room-dropdown").classList.remove("active")
+                    // console.log(e.target)
+                } 
+
+                if( !e.target.classList.contains('event-day') ) {
+                    document.querySelector(".event-tool").style.display = 'none'
+                    document.querySelector(".event-tool-after").style.display = 'none'
+                } 
+
+                if(pageActive.pageCalendar) {
+                    // if(e.target.classList.contains('selectroom-input') || e.target.classList.contains('selectdept-input') || e.target.classList.contains('room-input')) {
+
+                        // document.getElementById(e.target.classList+'-label').innerHTML = e.target.getAttribute("name")
+
+                        // if(e.target.classList.contains('selectroom-input') || e.target.classList.contains('selectdept-input')) {
+                        //     document.getElementById(e.target.classList).value =  e.target.getAttribute("id")  
+                        // }
+
+                        //if(e.target.classList.contains('room-input')) {
+
+                            // document.querySelectorAll(".event-day." + roomCurrent.roomid).forEach((eventdept) => {
+                            //     eventdept.remove();
+
+                            // })
+
+                            // renderEventsPlanningReset(roomCurrent.roomid)
+                            // renderEventsPlanning(e.target.getAttribute("id"))
+
+
+                            // roomCurrent.roomid =  e.target.getAttribute("id")
+                            // roomCurrent.index =  parseInt(e.target.getAttribute("key"))
+                            // console.log( roomCurrent.roomid )
+
+                            // renderSelectAccessories(e.target.getAttribute("id"))
+
+
+                            // document.getElementById("selectroom-input-label").innerHTML = e.target.getAttribute("name")
+                            // document.getElementById("selectroom-input").value = e.target.getAttribute("id")
+
+                        //}
+                   // } 
+
+                    
+                    if(!(e.target.classList.contains('day') || e.target.classList.contains('days'))) {
+
+                        if( !document.querySelector(".event-dialog").classList.contains('active') ) {
+                            const days = document.querySelectorAll(".day");
+
+                            days.forEach((day) => {
+                                day.classList.remove("active");
+                                day.classList.remove("selected");
+                                day.classList.remove("last-selected");
+                                day.classList.remove("first-selected");
+                            });
+                        }
+
+                    } 
+                
+
+                    if(!(e.target.classList.contains('selectroom') || e.target.classList.contains('selectroom-dropdown'))) {
+                        document.querySelector(".selectroom-dropdown").classList.remove("active")
+
+                    }
+                    
+                    if(!(e.target.classList.contains('selectdept') || e.target.classList.contains('selectdept-dropdown'))) {
+                        document.querySelector(".selectdept-dropdown").classList.remove("active")
+
+                    } 
+
+                    if( e.target.classList.contains('event-dialog')) {
+                       
+                        inactiveDialog()
+                    }
+
+
+                    // if(e.target.classList.contains('selectroom-input-edit') || e.target.classList.contains('selectdept-input-edit') ) {
+                    //     // console.log(e.target)
+                    //     document.getElementById(e.target.classList+'-label').innerHTML = e.target.getAttribute("name")
+
+                    //     if(e.target.classList.contains('selectroom-input-edit') || e.target.classList.contains('selectdept-input-edit')) {
+                    //         document.getElementById(e.target.classList).value =  e.target.getAttribute("id")  
+
+                    //         if(e.target.classList.contains('selectroom-input-edit')) {
+                    //             renderSelectAccessoriesEdit(e.target.getAttribute("id"), 'null');
+                    //             console.log(e.target)
+
+                    //         }
+
+                    //     }
+                      
+                    // } 
+
+
+                    if(!(e.target.classList.contains('selectroom-edit') || e.target.classList.contains('selectroom-dropdown-edit'))) {
+                        document.querySelector(".selectroom-dropdown-edit").classList.remove("active")
+
+                    }
+                    
+                    if(!(e.target.classList.contains('selectdept-edit') || e.target.classList.contains('selectdept-dropdown-edit'))) {
+                        document.querySelector(".selectdept-dropdown-edit").classList.remove("active")
+
+                    } 
+
+                    if( e.target.classList.contains('content-edit-dialogMove')) {
+                        inactiveDialogEdit()
+                    }
+                }
+            })
+        }) 
+
+        const makeCodeId = (length) => {
+            let result = '';
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            const charactersLength = characters.length;
+            let counter = 0;
+
+            while (counter < length) {
+                result += characters.charAt(Math.floor(Math.random() * charactersLength));
+                counter += 1;
+            }
+
+            return result;
+        }
+
+        const generate = (idN, deptName) => {
+            // console.log(deptName)
+            let currentDate = new Date()
+            return idN + "-" + makeCodeId(5) + "-" + ( str00(currentDate.getDate(),2)  + str00((currentDate.getMonth()+1),2) + currentDate.getFullYear() )  + "-" + deptName.slice(0,3)
+        }
+
+        const addPlanEvent = (obj, acclist) => {
+ 
+            obj.forEach((e,index) => { 
+
+                if( dateRangeOverlaps(new Date(formatDatetime(new Date(e.date), e.startdate)), new Date(formatDatetime(new Date(e.date), e.enddate)), new Date(), new Date()) ) {
+                    document.querySelector('.room-status').classList.add('active')
+                    // console.log("active status")
+                } else {
+                    // console.log("inactive status")
+                }
+
+                let spanEvent = document.createElement('span')
+                spanEvent.classList = 'event-day ' + e.deptid + ' ' + e.mrid + ' ' + e.planid + ( new Date(formatDatetime(new Date(e.date), e.enddate)) < new Date( )? ' event-end' : '' )
+                spanEvent.style = "--eventSize: 1;--color-event:var(--color-"+ e.deptid + ");" + ( document.querySelector(".radio-dept-" + e.deptid).classList.contains('disable')? "display: none;" : "" ) +");"
+                spanEvent.textContent = convertTime(e.startdate) + " - " + convertTime(e.enddate) + " by " + e.planner;
+                spanEvent.id = "event-day//" + new Date(formatDatetime(new Date(e.date), e.startdate)) + "//" + new Date(formatDatetime(new Date(e.date), e.enddate)) + "//" + e.planner
+                document.getElementById(e.date).appendChild(spanEvent)
+
+                dataEvents.push(
+                                    {
+                                        "planid" : e.planid,
+                                        "title" : e.title,
+                                        "detail" : e.detail,
+                                        "mrid" : e.mrid,
+                                        "deptid" : e.deptid ,
+                                        "planner" : e.planner,
+                                        "startdate" : formatDatetime(new Date(e.date), e.startdate),
+                                        "enddate" : formatDatetime(new Date(e.date), e.enddate)
+                                    }
+                                )
+
+                $.ajax({
+ 
+                            url: "{{ route('meetingplanner.store') }}",
+                            type: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            data:{ 
+                                    "planid" : e.planid,
+                                    "title" : e.title,
+                                    "detail" : e.detail,
+                                    "mrid" : e.mrid,
+                                    "deptid" : e.deptid ,
+                                    "planner" : e.planner,
+                                    "startdate" : formatDatetime(new Date(e.date), e.startdate),
+                                    "enddate" : formatDatetime(new Date(e.date), e.enddate),
+                                    "items" : acclist
+                            },
+                            success: function(response) {
+                                // console.log('success')
+                            },
+                            error: function(xhr, status, error) {
+                                console.log(error)
+                            }
+
+                        });
+
+            })
+
+            addListenerEvens()
+    
+        }
+
+        const updatePlanEvent = (e, acclist) => {
+ 
+            document.querySelector(".event-day."+ e.planid).remove()
+
+            let spanEvent = document.createElement('span')
+            spanEvent.classList = 'event-day ' + e.deptid + ' ' + e.mrid + ' ' + e.planid + ( new Date(e.enddate) < new Date( )? ' event-end' : '' )
+            spanEvent.style = "--eventSize: 1;--color-event:var(--color-"+ e.deptid + ");" + ( document.querySelector(".radio-dept-" + e.deptid).classList.contains('disable')? "display: none;" : "" ) +");"
+            spanEvent.textContent = convertTime(e.startdate) + " - " + convertTime(e.enddate) + " by " + e.planner;
+            spanEvent.id = "event-day//" + new Date(formatDatetime(new Date(e.date), e.startdate)) + "//" + new Date(formatDatetime(new Date(e.date), e.enddate)) + "//" + e.planner
+
+            if(roomCurrent.roomid ==  e.mrid) {
+                document.getElementById(e.date).appendChild(spanEvent)
+            }
+
+            dataEvents[dataEvents.findIndex(obj => { return obj.planid === e.planid })] = (
+                {
+                    "planid" : e.planid,
+                    "mrid" : e.mrid,
+                    "deptid" : e.deptid,
+                    "planner" : e.planner,
+                    "title" : e.title ,
+                    "detail" : e.detail,
+                    "date" : e.date,
+                    "startdate" : formatDatetime(new Date(e.date), e.startdate),
+                    "enddate" : formatDatetime(new Date(e.date), e.enddate)
+                   
+                }
+              
+            )
+
+            $.ajax({
+ 
+                url: '/meetingplanner/' + e.planid,
+                type: 'PUT',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                data:{ 
+                        "planid" : e.planid,
+                        "mrid" : e.mrid,
+                        "deptid" : e.deptid,
+                        "planner" : e.planner,
+                        "title" : e.title ,
+                        "detail" : e.detail,
+                        "date" : new Date(e.date),
+                        "startdate" : formatDatetime(new Date(e.date), e.startdate),
+                        "enddate" : formatDatetime(new Date(e.date), e.enddate),
+                        "items" : acclist
+                },
+                success: function(response) {
+                    //console.log('success')
+                },
+                error: function(xhr, status, error) {
+                    console.log(error)
+                }
+
+            });
+
+            // console.log(dataEvents)
+
+            addListenerEvens()
+            inactiveDialogEdit()
+
+        }
+
+        const form = document.getElementById('form')
+
+        form.addEventListener('submit', (event) => {
+            event.preventDefault()
+            const data = new FormData(event.currentTarget)
+            let itemlist = [];
+
+            let checkInputNull = false;
+            for (var pair of data.entries()) {
+                if(pair[1] == '' && ( pair[0] == "planner" || pair[0] == "title" || pair[0] == "deptid")) {
+                    checkInputNull = true;
+                    document.getElementById(pair[0]).classList.add('active')
+
+                }
+ 
+                if (pair[0].split('-')[0] == 'item') {
+                    itemlist.push(pair[1])
+ 
+                }
+
+                // console.log(pair[0] + ", " + pair[1])
+            }        
+
+ 
+            if(checkInputNull) {
+                    return;
+            }
+
+ 
+            let newPlanId;
+            let newobj = [];
+
+            var datef = data.get('datef') != ""? new Date(data.get('datef')) : new Date(data.get('date'));
+            var datel = new Date(data.get('date'));
+
+            for (var d = new Date(datef.getFullYear(), datef.getMonth(), datef.getDate()); d <= datel; d.setDate(d.getDate() + 1)) {
+
+                newPlanId = generate('plan', data.get('deptid'))
+                newobj.push(
+                                {
+                                    "planid" : newPlanId,
+                                    "mrid" : data.get('mrid'),
+                                    "deptid" : data.get('deptid'),
+                                    "planner" : data.get('planner'),
+                                    "title" : data.get('title'),
+                                    "detail" : data.get('detail'),
+                                    "date" : new Date(d),
+                                    "startdate" : data.get('startdate'),
+                                    "enddate" : data.get('enddate')
+                                }
+                            )
+
+            }
+            // console.log(itemlist)
+
+            addPlanEvent(newobj, itemlist);
+            newobj = []
+            itemlist = []
+            inactiveDialog()
+        })
+
+
+        const formEdit = document.getElementById('form-edit')
+
+        formEdit.addEventListener('submit', (event) => {
+            event.preventDefault()
+            const data = new FormData(event.currentTarget)
+            let itemlist = [];
+            let checkInputNull = false;
+
+            for (var pair of data.entries()) {
+                if(pair[1] == '' && ( pair[0] == "mrid-edit" ||  pair[0] == "title-edit" || pair[0] == "deptid-edit" || pair[0] == "date-edit" || pair[0] == "startdate-edit" || pair[0] == "enddate-edit" )) {
+                    checkInputNull = true;
+
+                    if(pair[0] == "enddate-edit") {document.querySelector(".alert-input.startdate-edit").classList.add('active')}  else {document.querySelector(".alert-input."+pair[0]).classList.add('active')}
+                    
+                } else if(pair[0] == "mrid-edit" ||  pair[0] == "title-edit" || pair[0] == "deptid-edit" || pair[0] == "date-edit" || pair[0] == "startdate-edit" || pair[0] == "enddate-edit" ) {
+
+                        if(pair[0] == "enddate-edit" && document.querySelector(".alert-input.startdate-edit").classList.contains('active')) {
+                            document.querySelector(".alert-input.startdate-edit").classList.remove('active')
+
+                        }  else if(pair[0] != "enddate-edit" && document.querySelector(".alert-input."+pair[0]).classList.contains('active')) {
+                            document.querySelector(".alert-input."+pair[0]).classList.remove('active')
+
+                        }
+                
+                }
+
+                if (pair[0].split('-')[0] == 'item') {
+                    itemlist.push(pair[1])
+ 
+                }
+                // console.log(pair[0] + ", " + pair[1])
+            }  
+            
+
+            updatePlanEvent(
+                                {
+                                    "planid" : data.get('planid'),
+                                    // "appointid" : data.get('appointid'),
+                                    "mrid" : data.get('mrid-edit'),
+                                    "deptid" : data.get('deptid-edit'),
+                                    "planner" : data.get('planner-edit'),
+                                    "title" : data.get('title-edit'),
+                                    "detail" : data.get('detail-edit'),
+                                    "date" :  new Date(data.get('date-edit').replace('-','/')),
+                                    "startdate" : data.get('startdate-edit'),
+                                    "enddate" : data.get('enddate-edit')
+                                },
+
+                                itemlist
+
+                            )
+
+            itemlist = []
+
+
+        })
+
+
+        // console.log(dateRangeOverlaps(new Date('Tue May 09 2023 10:00:00 GMT+0700 (Indochina Time)'),
+        //                  new Date('Tue May 09 2023 17:00:00 GMT+0700 (Indochina Time)'),
+        //                  new Date('Tue May 09 2023 09:00:00 GMT+0700 (Indochina Time)'),
+        //                  new Date('Tue May 09 2023 10:00:00 GMT+0700 (Indochina Time)')))
+
+
+   </script>
+</body>
+</html>
+
+<!-- localStorage.setItem("myCat", "Tom");
+const cat = localStorage.getItem("myCat");
+localStorage.removeItem("myCat");
+localStorage.clear(); -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{{-- ////////////////////////// <code> access data json </code> /////////////////////////////////// --}}
+
+{{--  
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+ 
+
+    <script>
+        var value = JSON.parse({!! json_encode($json) !!});
+        console.log(value.Dept[0].name);
+
+ 
+    </script>
+</body>
+</html> --}}
